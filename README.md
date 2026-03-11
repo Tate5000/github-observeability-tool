@@ -2,7 +2,7 @@
 
 Shareable GitHub issue observability dashboard with live Vercel refreshes.
 
-Built for PRIA.
+Created by Tate Carroll and shaped through active PRIA operating workflows.
 
 It is built to answer a few leadership questions quickly:
 
