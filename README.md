@@ -2,7 +2,7 @@
 
 Shareable GitHub issue observability dashboard with live Vercel refreshes.
 
-Built for PRIA.
+Created and maintained by Tate Carroll.
 
 It is built to answer a few leadership questions quickly:
 
@@ -96,3 +96,11 @@ This repo is already structured for a Vercel import. Use the repo root as the pr
 - The Vercel function keeps your GitHub token server-side. The browser never receives the token.
 - `issue-graph-data.json` exists as a fallback and for local static previews.
 - No local keys or tokens should be committed. `.gitignore` excludes common secret-bearing files and Vercel local state.
+
+## Ownership and licensing
+
+- Copyright © 2021 Tate Carroll
+- Shared for review and evaluation
+- Reuse, redistribution, modification, and commercial use require prior written permission
+
+See [LICENSE](./LICENSE) for the full terms.
