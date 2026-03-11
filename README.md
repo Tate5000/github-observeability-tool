@@ -99,7 +99,7 @@ This repo is already structured for a Vercel import. Use the repo root as the pr
 
 ## Ownership and licensing
 
-- Copyright © 2026 Tate Carroll
+- Copyright © 2021 Tate Carroll
 - Shared for review and evaluation
 - Reuse, redistribution, modification, and commercial use require prior written permission
 
