@@ -498,56 +498,6 @@
         line-height: 1.6;
       }
 
-      .footer {
-        margin-top: 18px;
-        padding: 22px 24px;
-      }
-
-      .footer-grid {
-        display: grid;
-        grid-template-columns: 1.6fr 1fr;
-        gap: 18px;
-        align-items: start;
-      }
-
-      .footer-kicker {
-        font-family: "Space Grotesk", sans-serif;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 0.24em;
-        text-transform: uppercase;
-        color: #90a29b;
-      }
-
-      .footer-title {
-        margin-top: 8px;
-        font-family: "Space Grotesk", sans-serif;
-        font-size: 22px;
-        font-weight: 700;
-        color: #f2faf4;
-      }
-
-      .footer-copy,
-      .footer-meta {
-        margin-top: 10px;
-        font-size: 14px;
-        line-height: 1.65;
-        color: #7e928a;
-      }
-
-      .footer-meta {
-        margin-top: 0;
-      }
-
-      .footer-link {
-        color: #d6ff72;
-        text-decoration: none;
-      }
-
-      .footer-link:hover {
-        text-decoration: underline;
-      }
-
       @media (max-width: 1320px) {
         .metrics {
           grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -583,8 +533,7 @@
 
         .metrics,
         .panel-grid,
-        .filter-grid,
-        .footer-grid {
+        .filter-grid {
           grid-template-columns: 1fr;
         }
 
@@ -787,32 +736,9 @@
           <div class="milestone-list" id="milestone-health"></div>
         </article>
       </section>
-
-      <footer class="panel footer">
-        <div class="footer-grid">
-          <div>
-            <div class="footer-kicker">Authorship</div>
-            <div class="footer-title">Created and maintained by Tate Carroll.</div>
-            <div class="footer-copy">
-              This dashboard reflects observability, backlog management, and delivery tooling patterns refined across
-              fifteen years of engineering practice. It is presented as an authored operating surface, not a generic
-              template.
-            </div>
-          </div>
-          <div>
-            <div class="footer-kicker">Usage</div>
-            <div class="footer-meta">Copyright © 2026 Tate Carroll. All rights reserved.</div>
-            <div class="footer-meta">
-              Shared for review and evaluation. See the
-              <a class="footer-link" href="./LICENSE" target="_blank" rel="noreferrer">license terms</a>
-              for reuse and distribution conditions.
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
 
     <script defer src="./vendor/chart.umd.min.js"></script>
-    <script type="module" src="./issue-graph-app.js?v=3"></script>
+    <script type="module" src="./issue-graph-app.js?v=2"></script>
   </body>
 </html>
