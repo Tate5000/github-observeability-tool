@@ -72,18 +72,18 @@ const AGING_BUCKETS = [
 ];
 
 const COLORS = {
-  open: '#123459',
-  closed: '#22c55e',
-  bug: '#e85d5d',
-  enhancement: '#15b8a6',
-  documentation: '#3b82f6',
-  question: '#f59f0a',
-  support: '#9b5de5',
-  priority: '#f97316',
-  area: '#3b82f6',
-  grid: 'rgba(100, 116, 139, 0.15)',
-  ink: '#1f2937',
-  muted: '#64748b',
+  open: '#74d8ff',
+  closed: '#7fff9f',
+  bug: '#ff7b78',
+  enhancement: '#86f5c6',
+  documentation: '#6cc9ff',
+  question: '#ffcb74',
+  support: '#b59cff',
+  priority: '#ff9d52',
+  area: '#6cc9ff',
+  grid: 'rgba(146, 168, 159, 0.14)',
+  ink: '#eff8f2',
+  muted: '#90a29b',
 };
 
 const charts = {};
@@ -117,7 +117,7 @@ let autoRefreshHandle = null;
 
 Chart.defaults.color = COLORS.muted;
 Chart.defaults.borderColor = COLORS.grid;
-Chart.defaults.font.family = '"Avenir Next", "Segoe UI", sans-serif';
+Chart.defaults.font.family = '"Instrument Sans", "Segoe UI", sans-serif';
 Chart.defaults.animation = false;
 
 function familyOf(label) {
@@ -765,13 +765,13 @@ function renderPriorityChart(view) {
         {
           label: 'Open',
           data: series.map((row) => row.open),
-          backgroundColor: '#ef4444',
+          backgroundColor: COLORS.bug,
           borderRadius: 8,
         },
         {
           label: 'Closed',
           data: series.map((row) => row.closed),
-          backgroundColor: '#22c55e',
+          backgroundColor: COLORS.closed,
           borderRadius: 8,
         },
       ],
@@ -832,7 +832,7 @@ function renderActivityChart(view) {
           label: 'Opened',
           data: view.activitySeries.map((row) => row.opened),
           borderColor: COLORS.open,
-          backgroundColor: 'rgba(18, 52, 89, 0.12)',
+          backgroundColor: 'rgba(116, 216, 255, 0.12)',
           fill: true,
           tension: 0.32,
         },
@@ -840,7 +840,7 @@ function renderActivityChart(view) {
           label: 'Closed',
           data: view.activitySeries.map((row) => row.closed),
           borderColor: COLORS.closed,
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          backgroundColor: 'rgba(127, 255, 159, 0.1)',
           fill: true,
           tension: 0.32,
         },
@@ -866,7 +866,7 @@ function renderBurnupChart(view) {
           label: 'Total Scope',
           data: view.burnupSeries.map((row) => row.scope),
           borderColor: COLORS.open,
-          backgroundColor: 'rgba(18, 52, 89, 0.08)',
+          backgroundColor: 'rgba(116, 216, 255, 0.08)',
           fill: false,
           tension: 0.28,
         },
@@ -874,7 +874,7 @@ function renderBurnupChart(view) {
           label: 'Completed',
           data: view.burnupSeries.map((row) => row.completed),
           borderColor: COLORS.closed,
-          backgroundColor: 'rgba(34, 197, 94, 0.08)',
+          backgroundColor: 'rgba(127, 255, 159, 0.08)',
           fill: false,
           tension: 0.28,
         },
@@ -882,7 +882,7 @@ function renderBurnupChart(view) {
           label: 'Open Backlog',
           data: view.burnupSeries.map((row) => row.backlog),
           borderColor: COLORS.priority,
-          backgroundColor: 'rgba(249, 115, 22, 0.08)',
+          backgroundColor: 'rgba(255, 157, 82, 0.08)',
           borderDash: [6, 4],
           fill: false,
           tension: 0.28,
@@ -915,13 +915,13 @@ function renderAgingChart(view) {
         {
           label: 'High Priority Open',
           data: view.agingSeries.map((row) => row.highPriority),
-          backgroundColor: '#ef4444',
+          backgroundColor: COLORS.bug,
           borderRadius: 8,
         },
         {
           label: 'Other Open',
           data: view.agingSeries.map((row) => row.other),
-          backgroundColor: 'rgba(18, 52, 89, 0.24)',
+          backgroundColor: 'rgba(116, 216, 255, 0.22)',
           borderRadius: 8,
         },
       ],
@@ -956,7 +956,7 @@ function renderAreasChart(view) {
         {
           label: 'Closed',
           data: series.map((row) => row.closed),
-          backgroundColor: 'rgba(59, 130, 246, 0.28)',
+          backgroundColor: 'rgba(108, 201, 255, 0.24)',
           borderRadius: 8,
         },
       ],
