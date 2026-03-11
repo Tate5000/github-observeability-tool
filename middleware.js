@@ -1,3 +1,4 @@
+import { next } from '@vercel/functions';
 import { isAuthorizedRequest, isPasswordProtectionEnabled } from './auth-utils.js';
 
 export const config = {
@@ -177,16 +178,16 @@ function loginScreenHtml(currentPath) {
 }
 
 export default function middleware(request) {
-  if (!isPasswordProtectionEnabled()) return;
+  if (!isPasswordProtectionEnabled()) return next();
 
   const url = new URL(request.url);
 
   if (url.pathname === '/api/auth' || url.pathname.startsWith('/.well-known/')) {
-    return;
+    return next();
   }
 
   if (isAuthorizedRequest(request)) {
-    return;
+    return next();
   }
 
   if (url.pathname.startsWith('/api/')) {

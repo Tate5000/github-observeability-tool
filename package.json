@@ -2,6 +2,9 @@
   "name": "github-observeability-tool",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@vercel/functions": "^3.1.0"
+  },
   "scripts": {
     "refresh": "node ./scripts/refresh-data.mjs"
   }
