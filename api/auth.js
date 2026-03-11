@@ -2,75 +2,92 @@ import {
   createAuthCookieHeader,
   createClearAuthCookieHeader,
   getSitePassword,
+  getRequestHeader,
   isPasswordProtectionEnabled,
 } from '../auth-utils.js';
 
+const NO_STORE_HEADER = 'no-store, no-cache, must-revalidate, max-age=0';
+
+function sendJson(response, status, payload, extraHeaders = {}) {
+  response.statusCode = status;
+  response.setHeader('Cache-Control', NO_STORE_HEADER);
+  response.setHeader('Content-Type', 'application/json; charset=utf-8');
+
+  Object.entries(extraHeaders).forEach(([key, value]) => {
+    response.setHeader(key, value);
+  });
+
+  response.end(JSON.stringify(payload));
+}
+
+async function readRawBody(request) {
+  if (typeof request.body === 'string') return request.body;
+  if (Buffer.isBuffer(request.body)) return request.body.toString('utf8');
+  if (request.body && typeof request.body === 'object') return JSON.stringify(request.body);
+
+  return new Promise((resolve, reject) => {
+    let rawBody = '';
+    request.setEncoding?.('utf8');
+    request.on('data', (chunk) => {
+      rawBody += chunk;
+    });
+    request.on('end', () => resolve(rawBody));
+    request.on('error', reject);
+  });
+}
+
 async function readPassword(request) {
-  const contentType = request.headers.get('content-type') || '';
+  const contentType = getRequestHeader(request, 'content-type');
+  const rawBody = await readRawBody(request);
 
   if (contentType.includes('application/json')) {
-    const payload = await request.json().catch(() => ({}));
-    return String(payload.password || '');
+    try {
+      const payload = JSON.parse(rawBody || '{}');
+      return String(payload.password || '');
+    } catch {
+      return '';
+    }
   }
 
   if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
-    const formData = await request.formData();
-    return String(formData.get('password') || '');
+    const params = new URLSearchParams(rawBody);
+    return String(params.get('password') || '');
   }
 
   return '';
 }
 
-async function handleLogin(request) {
+async function handleLogin(request, response) {
   if (!isPasswordProtectionEnabled()) {
-    return Response.json({ ok: true }, { status: 200 });
+    sendJson(response, 200, { ok: true });
+    return;
   }
 
   const submittedPassword = await readPassword(request);
 
   if (!submittedPassword || submittedPassword !== getSitePassword()) {
-    return Response.json(
-      { error: 'Invalid password.' },
-      {
-        status: 401,
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        },
-      },
-    );
+    sendJson(response, 401, { error: 'Invalid password.' });
+    return;
   }
 
-  return Response.json(
+  sendJson(
+    response,
+    200,
     { ok: true },
-    {
-      status: 200,
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        'Set-Cookie': createAuthCookieHeader(),
-      },
-    },
+    { 'Set-Cookie': createAuthCookieHeader() },
   );
 }
 
-function handleLogout() {
-  return Response.json(
-    { ok: true },
-    {
-      status: 200,
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        'Set-Cookie': createClearAuthCookieHeader(),
-      },
-    },
-  );
+function handleLogout(_request, response) {
+  sendJson(response, 200, { ok: true }, { 'Set-Cookie': createClearAuthCookieHeader() });
 }
 
-function methodNotAllowed() {
-  return Response.json({ error: 'Method not allowed.' }, { status: 405 });
+function methodNotAllowed(response) {
+  sendJson(response, 405, { error: 'Method not allowed.' });
 }
 
-export default async function handler(request) {
-  if (request.method === 'POST') return handleLogin(request);
-  if (request.method === 'DELETE') return handleLogout();
-  return methodNotAllowed();
+export default async function handler(request, response) {
+  if (request.method === 'POST') return handleLogin(request, response);
+  if (request.method === 'DELETE') return handleLogout(request, response);
+  return methodNotAllowed(response);
 }

@@ -35,10 +35,26 @@ export function parseCookies(cookieHeader = '') {
   );
 }
 
+export function getRequestHeader(request, name) {
+  const headers = request?.headers;
+  if (!headers) return '';
+
+  if (typeof headers.get === 'function') {
+    return headers.get(name) || '';
+  }
+
+  const headerValue = headers[String(name).toLowerCase()] ?? headers[name];
+  if (Array.isArray(headerValue)) {
+    return headerValue.join('; ');
+  }
+
+  return typeof headerValue === 'string' ? headerValue : '';
+}
+
 export function isAuthorizedRequest(request) {
   if (!isPasswordProtectionEnabled()) return true;
 
-  const cookieHeader = request.headers.get('cookie') || '';
+  const cookieHeader = getRequestHeader(request, 'cookie');
   const cookies = parseCookies(cookieHeader);
   return cookies[AUTH_COOKIE_NAME] === createAuthToken();
 }

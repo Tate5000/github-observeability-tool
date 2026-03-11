@@ -5,6 +5,7 @@ export const maxDuration = 30;
 const FALLBACK_SOURCE_REPO = 'PRIA-Technologies/skunkworks';
 const GITHUB_API_VERSION = '2022-11-28';
 const GITHUB_API_BASE_URL = 'https://api.github.com';
+const NO_STORE_HEADER = 'no-store, no-cache, must-revalidate, max-age=0';
 
 function resolveSourceRepo() {
   return process.env.ISSUE_SOURCE_REPO || FALLBACK_SOURCE_REPO;
@@ -96,41 +97,29 @@ async function buildSnapshot() {
   };
 }
 
-async function handleRequest(request) {
+function sendJson(response, status, payload) {
+  response.statusCode = status;
+  response.setHeader('Cache-Control', NO_STORE_HEADER);
+  response.setHeader('Content-Type', 'application/json; charset=utf-8');
+  response.end(JSON.stringify(payload));
+}
+
+async function handleRequest(request, response) {
   if (isPasswordProtectionEnabled() && !isAuthorizedRequest(request)) {
-    return Response.json(
-      { error: 'Authentication required.' },
-      {
-        status: 401,
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        },
-      },
-    );
+    sendJson(response, 401, { error: 'Authentication required.' });
+    return;
   }
 
   try {
     const snapshot = await buildSnapshot();
-    return Response.json(snapshot, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-      },
-    });
+    sendJson(response, 200, snapshot);
   } catch (error) {
-    return Response.json(
-      {
-        error: error instanceof Error ? error.message : String(error),
-      },
-      {
-        status: 500,
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        },
-      },
-    );
+    sendJson(response, 500, {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 
-export default async function handler(request) {
-  return handleRequest(request);
+export default async function handler(request, response) {
+  return handleRequest(request, response);
 }
