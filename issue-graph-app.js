@@ -58,10 +58,17 @@ const DAY_MS = HOUR_MS * 24;
 const LIVE_REFRESH_INTERVAL_MS = 1000 * 60 * 5;
 const LIVE_DATA_URL = '/api/issues-data';
 const SNAPSHOT_DATA_URL = './issue-graph-data.json';
+const FLOW_LOOKBACK_WEEKS = 12;
 const CLOSURE_SPEED_BUCKETS = [
   { label: '24 hours', limitMs: DAY_MS, color: '#15b8a6' },
   { label: '7 days', limitMs: DAY_MS * 7, color: '#3b82f6' },
   { label: '30 days', limitMs: DAY_MS * 30, color: '#f59f0a' },
+];
+const AGING_BUCKETS = [
+  { label: '0-7d', minDays: 0, maxDays: 7 },
+  { label: '8-30d', minDays: 7, maxDays: 30 },
+  { label: '31-90d', minDays: 30, maxDays: 90 },
+  { label: '90d+', minDays: 90, maxDays: Number.POSITIVE_INFINITY },
 ];
 
 const COLORS = {
@@ -98,6 +105,7 @@ const elements = {
   prioritySelect: document.getElementById('priority-select'),
   metrics: document.getElementById('metrics'),
   milestoneMeta: document.getElementById('milestone-meta'),
+  agingMeta: document.getElementById('aging-meta'),
   familyPressure: document.getElementById('family-pressure'),
   hotspots: document.getElementById('hotspots'),
   riskList: document.getElementById('risk-list'),
@@ -146,6 +154,31 @@ function formatDate(dateString) {
     day: 'numeric',
     year: 'numeric',
   }).format(new Date(dateString));
+}
+
+function formatDuration(ms) {
+  if (ms == null || Number.isNaN(ms)) return 'n/a';
+  if (ms < DAY_MS * 2) return `${Math.max(1, Math.round(ms / HOUR_MS))}h`;
+  if (ms < DAY_MS * 21) return `${(ms / DAY_MS).toFixed(ms < DAY_MS * 7 ? 1 : 0)}d`;
+  const weeks = ms / (DAY_MS * 7);
+  if (weeks < 12) return `${weeks.toFixed(1)}w`;
+  return `${Math.round(ms / DAY_MS)}d`;
+}
+
+function percentile(sortedValues, percentileValue) {
+  if (!sortedValues.length) return null;
+  const position = (sortedValues.length - 1) * percentileValue;
+  const lowerIndex = Math.floor(position);
+  const upperIndex = Math.ceil(position);
+  if (lowerIndex === upperIndex) return sortedValues[lowerIndex];
+  const weight = position - lowerIndex;
+  return sortedValues[lowerIndex] * (1 - weight) + sortedValues[upperIndex] * weight;
+}
+
+function issueAgeMs(issue, referenceMs) {
+  const createdAt = new Date(issue.createdAt || issue.updatedAt || referenceMs).getTime();
+  if (Number.isNaN(createdAt)) return null;
+  return Math.max(0, referenceMs - createdAt);
 }
 
 function weekStart(dateString) {
@@ -243,6 +276,7 @@ function buildView() {
   const issues = snapshot.issues.filter(issueMatchesFilters);
   const openIssues = issues.filter((issue) => issue.state === 'OPEN');
   const closedIssues = issues.filter((issue) => issue.state === 'CLOSED');
+  const nowMs = Date.now();
 
   const labelStats = new Map();
   const areaStats = new Map();
@@ -362,7 +396,7 @@ function buildView() {
   const weeks = [];
   const now = new Date();
   const start = weekStart(now.toISOString());
-  for (let index = 11; index >= 0; index -= 1) {
+  for (let index = FLOW_LOOKBACK_WEEKS - 1; index >= 0; index -= 1) {
     const week = new Date(start);
     week.setUTCDate(week.getUTCDate() - index * 7);
     weeks.push(weekKey(week));
@@ -377,24 +411,64 @@ function buildView() {
     if (closedKey && closedKey in closedByWeek) closedByWeek[closedKey] += 1;
   }
 
+  const lookbackStart = new Date(`${weeks[0]}T00:00:00Z`);
+  let cumulativeScope = issues.filter((issue) => issue.createdAt && new Date(issue.createdAt) < lookbackStart).length;
+  let cumulativeCompleted = issues.filter((issue) => issue.closedAt && new Date(issue.closedAt) < lookbackStart).length;
+  const burnupSeries = weeks.map((key) => {
+    cumulativeScope += openedByWeek[key];
+    cumulativeCompleted += closedByWeek[key];
+    return {
+      label: shortWeekLabel(key),
+      scope: cumulativeScope,
+      completed: cumulativeCompleted,
+      backlog: cumulativeScope - cumulativeCompleted,
+    };
+  });
+
   const closureSpeedSeries = CLOSURE_SPEED_BUCKETS.map((bucket) => ({
     ...bucket,
     count: 0,
     share: 0,
   }));
+  const closureDurations = [];
 
   let closedWithTiming = 0;
   for (const issue of closedIssues) {
     const durationMs = closureDurationMs(issue);
     if (durationMs === null) continue;
     closedWithTiming += 1;
+    closureDurations.push(durationMs);
     for (const bucket of closureSpeedSeries) {
       if (durationMs <= bucket.limitMs) bucket.count += 1;
     }
   }
+  closureDurations.sort((a, b) => a - b);
 
   for (const bucket of closureSpeedSeries) {
     bucket.share = closedWithTiming ? bucket.count / closedWithTiming : 0;
+  }
+
+  const agingSeries = AGING_BUCKETS.map((bucket) => ({
+    ...bucket,
+    total: 0,
+    highPriority: 0,
+    other: 0,
+  }));
+
+  let staleOpenCount = 0;
+  for (const issue of openIssues) {
+    const ageMs = issueAgeMs(issue, nowMs);
+    if (ageMs === null) continue;
+    const ageDays = ageMs / DAY_MS;
+    const bucket = agingSeries.find((entry) => ageDays >= entry.minDays && ageDays < entry.maxDays);
+    if (!bucket) continue;
+    bucket.total += 1;
+    if (['priority:P0', 'priority:P1'].includes(priorityOf(issue))) {
+      bucket.highPriority += 1;
+    } else {
+      bucket.other += 1;
+    }
+    if (ageDays >= 30) staleOpenCount += 1;
   }
 
   const familyRows = Object.entries(FAMILY_LABELS)
@@ -427,8 +501,10 @@ function buildView() {
       open: openIssues.length,
       closed: closedIssues.length,
       closureRate: issues.length ? closedIssues.length / issues.length : 0,
+      medianCloseMs: percentile(closureDurations, 0.5),
+      p90CloseMs: percentile(closureDurations, 0.9),
       highPriorityOpen: openIssues.filter((issue) => ['priority:P0', 'priority:P1'].includes(priorityOf(issue))).length,
-      avgLabels: issues.length ? issues.reduce((sum, issue) => sum + issue.labels.length, 0) / issues.length : 0,
+      staleOpenCount,
       milestoneCoverage: issues.length ? issues.filter((issue) => issue.milestone).length / issues.length : 0,
     },
     milestoneSeries,
@@ -446,6 +522,8 @@ function buildView() {
     riskIssues,
     familyRows,
     milestoneHealth,
+    burnupSeries,
+    agingSeries,
     activitySeries: weeks.map((key) => ({
       label: shortWeekLabel(key),
       opened: openedByWeek[key],
@@ -469,19 +547,24 @@ function renderMetrics(view) {
       sub: 'closed share in the current slice',
     },
     {
+      label: 'Median Time To Close',
+      value: formatDuration(view.metrics.medianCloseMs),
+      sub: view.metrics.p90CloseMs ? `p90 ${formatDuration(view.metrics.p90CloseMs)}` : 'not enough closed issues yet',
+    },
+    {
       label: 'High Priority Open',
       value: view.metrics.highPriorityOpen,
       sub: 'open P0 or P1 issues',
     },
     {
+      label: 'Stale Open >30d',
+      value: view.metrics.staleOpenCount,
+      sub: 'open issues older than 30 days',
+    },
+    {
       label: 'Milestone Coverage',
       value: formatPct(view.metrics.milestoneCoverage),
       sub: 'issues assigned to a milestone',
-    },
-    {
-      label: 'Avg Labels',
-      value: view.metrics.avgLabels ? view.metrics.avgLabels.toFixed(1) : '0.0',
-      sub: 'average label count per issue',
     },
   ];
 
@@ -773,6 +856,87 @@ function renderActivityChart(view) {
   });
 }
 
+function renderBurnupChart(view) {
+  upsertChart('burnup', 'burnup-chart', {
+    type: 'line',
+    data: {
+      labels: view.burnupSeries.map((row) => row.label),
+      datasets: [
+        {
+          label: 'Total Scope',
+          data: view.burnupSeries.map((row) => row.scope),
+          borderColor: COLORS.open,
+          backgroundColor: 'rgba(18, 52, 89, 0.08)',
+          fill: false,
+          tension: 0.28,
+        },
+        {
+          label: 'Completed',
+          data: view.burnupSeries.map((row) => row.completed),
+          borderColor: COLORS.closed,
+          backgroundColor: 'rgba(34, 197, 94, 0.08)',
+          fill: false,
+          tension: 0.28,
+        },
+        {
+          label: 'Open Backlog',
+          data: view.burnupSeries.map((row) => row.backlog),
+          borderColor: COLORS.priority,
+          backgroundColor: 'rgba(249, 115, 22, 0.08)',
+          borderDash: [6, 4],
+          fill: false,
+          tension: 0.28,
+        },
+      ],
+    },
+    options: {
+      ...baseChartOptions(),
+      scales: {
+        x: baseChartOptions().scales.x,
+        y: { ...baseChartOptions().scales.y, beginAtZero: false },
+      },
+    },
+  });
+}
+
+function renderAgingChart(view) {
+  if (elements.agingMeta) {
+    const staleShare = view.openIssues.length ? view.metrics.staleOpenCount / view.openIssues.length : 0;
+    elements.agingMeta.textContent = view.openIssues.length
+      ? `${view.metrics.staleOpenCount} stale · ${formatPct(staleShare)} of open`
+      : '0 stale';
+  }
+
+  upsertChart('aging', 'aging-chart', {
+    type: 'bar',
+    data: {
+      labels: view.agingSeries.map((row) => row.label),
+      datasets: [
+        {
+          label: 'High Priority Open',
+          data: view.agingSeries.map((row) => row.highPriority),
+          backgroundColor: '#ef4444',
+          borderRadius: 8,
+        },
+        {
+          label: 'Other Open',
+          data: view.agingSeries.map((row) => row.other),
+          backgroundColor: 'rgba(18, 52, 89, 0.24)',
+          borderRadius: 8,
+        },
+      ],
+    },
+    options: {
+      ...baseChartOptions(),
+      indexAxis: 'y',
+      scales: {
+        x: { ...baseChartOptions().scales.x, stacked: true, beginAtZero: true },
+        y: { ...baseChartOptions().scales.y, stacked: true },
+      },
+    },
+  });
+}
+
 function renderAreasChart(view) {
   const series = view.areaSeries.length
     ? view.areaSeries
@@ -867,6 +1031,8 @@ function render() {
   renderPriorityChart(view);
   renderTypeChart(view);
   renderActivityChart(view);
+  renderBurnupChart(view);
+  renderAgingChart(view);
   renderAreasChart(view);
   renderClosureSpeedChart(view);
 }

@@ -185,7 +185,7 @@
 
       .metrics {
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 14px;
         margin-top: 18px;
       }
@@ -544,6 +544,33 @@
           </div>
         </article>
 
+        <article class="panel span-8">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Flow</div>
+              <div class="panel-title">Burn-up Trend</div>
+              <div class="panel-copy">Total scope, completed scope, and remaining backlog across the last twelve weeks.</div>
+            </div>
+          </div>
+          <div class="chart-wrap short" id="burnup-chart-wrap">
+            <canvas id="burnup-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Backlog</div>
+              <div class="panel-title">Aging Pressure</div>
+              <div class="panel-copy">Open issues grouped by age so stale backlog and older high-priority work stand out fast.</div>
+            </div>
+            <div class="panel-meta" id="aging-meta"></div>
+          </div>
+          <div class="chart-wrap short" id="aging-chart-wrap">
+            <canvas id="aging-chart"></canvas>
+          </div>
+        </article>
+
         <article class="panel span-6">
           <div class="panel-head">
             <div>
@@ -617,6 +644,6 @@
     </div>
 
     <script defer src="./vendor/chart.umd.min.js"></script>
-    <script type="module" src="./issue-graph-app.js?v=1"></script>
+    <script type="module" src="./issue-graph-app.js?v=2"></script>
   </body>
 </html>

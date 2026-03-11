@@ -5,9 +5,12 @@ Shareable GitHub issue observability dashboard with live Vercel refreshes.
 It is built to answer a few leadership questions quickly:
 
 - How much work is open versus closed?
+- Is total scope growing faster than completion?
 - Which milestones and priority bands are carrying the most pressure?
+- Where is stale backlog accumulating?
 - Which labels and areas are hot?
 - How many tickets are closing within 24 hours, 7 days, and 30 days?
+- How long does work usually take to close?
 
 ## What is in this repo
 
@@ -17,6 +20,16 @@ It is built to answer a few leadership questions quickly:
 - `api/issues-data.js`: Vercel function that fetches live GitHub issue data server-side
 - `scripts/refresh-data.mjs`: refresh the snapshot from GitHub issues using `gh`
 - `vercel.json`: static deploy configuration for Vercel
+
+## Feature direction
+
+The dashboard now includes:
+
+- weekly throughput
+- burn-up trend across the last twelve weeks
+- open issue aging buckets with stale/high-priority pressure
+- closure-speed and median close-time reporting
+- milestone, area, and label hotspot views
 
 ## Live Vercel deployment
 
