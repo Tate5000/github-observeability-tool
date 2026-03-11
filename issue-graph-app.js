@@ -55,6 +55,9 @@ const TYPE_LABELS = {
 
 const HOUR_MS = 1000 * 60 * 60;
 const DAY_MS = HOUR_MS * 24;
+const LIVE_REFRESH_INTERVAL_MS = 1000 * 60 * 5;
+const LIVE_DATA_URL = '/api/issues-data';
+const SNAPSHOT_DATA_URL = './issue-graph-data.json';
 const CLOSURE_SPEED_BUCKETS = [
   { label: '24 hours', limitMs: DAY_MS, color: '#15b8a6' },
   { label: '7 days', limitMs: DAY_MS * 7, color: '#3b82f6' },
@@ -102,6 +105,7 @@ const elements = {
 };
 
 let snapshot = null;
+let autoRefreshHandle = null;
 
 Chart.defaults.color = COLORS.muted;
 Chart.defaults.borderColor = COLORS.grid;
@@ -219,6 +223,20 @@ function closureDurationMs(issue) {
   const closedAt = new Date(issue.closedAt).getTime();
   if (Number.isNaN(openedAt) || Number.isNaN(closedAt) || closedAt < openedAt) return null;
   return closedAt - openedAt;
+}
+
+function syncSnapshotMeta(source) {
+  const repoLabel = snapshot.repo || 'Unknown repo';
+  const generatedLabel = snapshot.generatedAt
+    ? new Date(snapshot.generatedAt).toLocaleString()
+    : 'unknown time';
+
+  elements.repoMeta.textContent = source === 'live'
+    ? `${repoLabel} · Live GitHub`
+    : `${repoLabel} · Snapshot fallback`;
+  elements.generatedMeta.textContent = source === 'live'
+    ? `Live as of ${generatedLabel}`
+    : `Snapshot as of ${generatedLabel}`;
 }
 
 function buildView() {
@@ -854,12 +872,27 @@ function render() {
 }
 
 async function loadSnapshot() {
-  const response = await fetch(`./issue-graph-data.json?ts=${Date.now()}`, { cache: 'no-store' });
-  if (!response.ok) throw new Error(`Failed to load snapshot: ${response.status}`);
-  snapshot = await response.json();
+  const attempts = [
+    { url: LIVE_DATA_URL, source: 'live' },
+    { url: `${SNAPSHOT_DATA_URL}?ts=${Date.now()}`, source: 'snapshot' },
+  ];
 
-  elements.repoMeta.textContent = snapshot.repo;
-  elements.generatedMeta.textContent = 'Generated ' + new Date(snapshot.generatedAt).toLocaleString();
+  let lastError = null;
+  for (const attempt of attempts) {
+    try {
+      const response = await fetch(attempt.url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Failed to load ${attempt.source} data: ${response.status}`);
+      snapshot = await response.json();
+      syncSnapshotMeta(attempt.source);
+      break;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (!snapshot) {
+    throw lastError || new Error('Unable to load dashboard data.');
+  }
 
   renderSelectOptions(
     elements.milestoneSelect,
@@ -871,6 +904,19 @@ async function loadSnapshot() {
     ),
     state.milestone,
   );
+}
+
+function startAutoRefresh() {
+  if (autoRefreshHandle) window.clearInterval(autoRefreshHandle);
+  autoRefreshHandle = window.setInterval(async () => {
+    if (document.visibilityState === 'hidden') return;
+    try {
+      await loadSnapshot();
+      render();
+    } catch (error) {
+      console.warn('Auto-refresh failed', error);
+    }
+  }, LIVE_REFRESH_INTERVAL_MS);
 }
 
 function bindControls() {
@@ -900,7 +946,7 @@ function bindControls() {
       render();
     } finally {
       elements.refreshButton.disabled = false;
-      elements.refreshButton.textContent = 'Refresh Data';
+      elements.refreshButton.textContent = 'Refresh Live Data';
     }
   });
 }
@@ -909,6 +955,7 @@ async function init() {
   bindControls();
   await loadSnapshot();
   render();
+  startAutoRefresh();
 }
 
 init().catch((error) => {

@@ -1,6 +1,6 @@
 # Github Observeability tool
 
-Shareable static dashboard for GitHub issue observability.
+Shareable GitHub issue observability dashboard with live Vercel refreshes.
 
 It is built to answer a few leadership questions quickly:
 
@@ -13,11 +13,34 @@ It is built to answer a few leadership questions quickly:
 
 - `index.html`: standalone dashboard shell
 - `issue-graph-app.js`: dashboard logic and charts
-- `issue-graph-data.json`: current snapshot of GitHub issue data
+- `issue-graph-data.json`: fallback snapshot of GitHub issue data
+- `api/issues-data.js`: Vercel function that fetches live GitHub issue data server-side
 - `scripts/refresh-data.mjs`: refresh the snapshot from GitHub issues using `gh`
 - `vercel.json`: static deploy configuration for Vercel
 
-## Refresh the data
+## Live Vercel deployment
+
+The dashboard is designed to load from `/api/issues-data` on every page load and auto-refresh while the page is open. If live data is unavailable, it falls back to the committed `issue-graph-data.json` snapshot.
+
+Required Vercel environment variables:
+
+- `GITHUB_TOKEN`
+- `ISSUE_SOURCE_REPO`
+
+Recommended `GITHUB_TOKEN` shape:
+
+- Fine-grained personal access token
+- Repository access to the source repo
+- `Issues: Read-only`
+
+Example:
+
+```bash
+GITHUB_TOKEN=github_pat_xxx
+ISSUE_SOURCE_REPO=PRIA-Technologies/skunkworks
+```
+
+## Local snapshot refresh
 
 Prerequisites:
 
@@ -44,13 +67,17 @@ ISSUE_SOURCE_REPO=PRIA-Technologies/skunkworks
 
 ## Deploy on Vercel
 
-This repo is already structured as a static site. Import it into Vercel and use the repo root as the project root.
+This repo is already structured for a Vercel import. Use the repo root as the project root.
 
 - Framework preset: `Other`
 - Build command: leave empty
 - Output directory: leave empty
+- Environment variables:
+  - `GITHUB_TOKEN`
+  - `ISSUE_SOURCE_REPO`
 
 ## Notes
 
-- This repo contains a snapshot, not live browser-side GitHub API calls.
+- The Vercel function keeps your GitHub token server-side. The browser never receives the token.
+- `issue-graph-data.json` exists as a fallback and for local static previews.
 - No local keys or tokens should be committed. `.gitignore` excludes common secret-bearing files and Vercel local state.
