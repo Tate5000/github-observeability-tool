@@ -39,6 +39,7 @@ Required Vercel environment variables:
 
 - `GITHUB_TOKEN`
 - `ISSUE_SOURCE_REPO`
+- `SITE_PASSWORD`
 
 Recommended `GITHUB_TOKEN` shape:
 
@@ -51,6 +52,7 @@ Example:
 ```bash
 GITHUB_TOKEN=github_pat_xxx
 ISSUE_SOURCE_REPO=PRIA-Technologies/skunkworks
+SITE_PASSWORD=your-password
 ```
 
 ## Local snapshot refresh
@@ -88,9 +90,11 @@ This repo is already structured for a Vercel import. Use the repo root as the pr
 - Environment variables:
   - `GITHUB_TOKEN`
   - `ISSUE_SOURCE_REPO`
+  - `SITE_PASSWORD`
 
 ## Notes
 
 - The Vercel function keeps your GitHub token server-side. The browser never receives the token.
+- The site-level password gate is implemented in code so the project does not need Vercel's paid Password Protection add-on.
 - `issue-graph-data.json` exists as a fallback and for local static previews.
 - No local keys or tokens should be committed. `.gitignore` excludes common secret-bearing files and Vercel local state.

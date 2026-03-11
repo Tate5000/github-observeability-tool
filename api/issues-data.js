@@ -1,3 +1,5 @@
+import { isAuthorizedRequest, isPasswordProtectionEnabled } from '../auth-utils.js';
+
 export const maxDuration = 30;
 
 const FALLBACK_SOURCE_REPO = 'PRIA-Technologies/skunkworks';
@@ -94,7 +96,19 @@ async function buildSnapshot() {
   };
 }
 
-async function handleRequest() {
+async function handleRequest(request) {
+  if (isPasswordProtectionEnabled() && !isAuthorizedRequest(request)) {
+    return Response.json(
+      { error: 'Authentication required.' },
+      {
+        status: 401,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        },
+      },
+    );
+  }
+
   try {
     const snapshot = await buildSnapshot();
     return Response.json(snapshot, {
@@ -117,12 +131,12 @@ async function handleRequest() {
   }
 }
 
-export async function GET() {
-  return handleRequest();
+export async function GET(request) {
+  return handleRequest(request);
 }
 
 export default {
-  fetch() {
-    return handleRequest();
+  fetch(request) {
+    return handleRequest(request);
   },
 };
