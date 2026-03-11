@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Issue Observability Dashboard</title>
+    <style>
+      :root {
+        --page: #ebe7dc;
+        --panel: rgba(251, 249, 242, 0.94);
+        --panel-strong: #ffffff;
+        --ink: #101828;
+        --muted: #556071;
+        --line: rgba(16, 24, 40, 0.1);
+        --shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+        --brand: #123459;
+        --brand-soft: #1d5c7c;
+        --bug: #e85d5d;
+        --enhancement: #15b8a6;
+        --priority: #f59f0a;
+        --area: #3b82f6;
+        --support: #9b5de5;
+        --success: #22c55e;
+        --danger: #dc2626;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(18, 52, 89, 0.08), transparent 24%),
+          radial-gradient(circle at bottom right, rgba(21, 184, 166, 0.08), transparent 26%),
+          linear-gradient(180deg, #efeade 0%, #e5decd 100%);
+      }
+
+      button,
+      select {
+        font: inherit;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .shell {
+        max-width: 1680px;
+        margin: 0 auto;
+        padding: 28px 22px 48px;
+      }
+
+      .hero,
+      .filters,
+      .panel,
+      .metric-card {
+        border-radius: 28px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 28px;
+        background:
+          linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(248, 244, 235, 0.92)),
+          radial-gradient(circle at top right, rgba(29, 92, 124, 0.12), transparent 24%);
+      }
+
+      .eyebrow,
+      .meta-chip,
+      .filter-label,
+      .section-kicker,
+      .metric-label,
+      .pill {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.84);
+        color: #5f6b7c;
+      }
+
+      h1 {
+        margin: 18px 0 10px;
+        font-size: clamp(40px, 6vw, 84px);
+        line-height: 0.93;
+        letter-spacing: -0.05em;
+      }
+
+      .hero-copy {
+        max-width: 980px;
+        font-size: 18px;
+        line-height: 1.7;
+        color: #4c596a;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .meta-chip,
+      .action-button,
+      .pill {
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.88);
+        color: #334155;
+        padding: 11px 14px;
+      }
+
+      .action-button {
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        transition: transform 120ms ease, border-color 120ms ease;
+      }
+
+      .action-button:hover,
+      .pill:hover {
+        transform: translateY(-1px);
+        border-color: rgba(18, 52, 89, 0.28);
+      }
+
+      .filters {
+        margin-top: 18px;
+        padding: 18px;
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 1fr 1fr auto;
+        gap: 14px;
+        align-items: end;
+      }
+
+      .filter-label {
+        color: #657285;
+        margin-bottom: 10px;
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .pill {
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .pill.active {
+        background: #10233d;
+        border-color: #10233d;
+        color: #f8fafc;
+      }
+
+      select {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: white;
+        color: #1f2937;
+        padding: 13px 14px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .metric-card {
+        padding: 18px;
+      }
+
+      .metric-label {
+        color: #667282;
+      }
+
+      .metric-value {
+        margin-top: 10px;
+        font-size: 34px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .metric-sub {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #556071;
+        line-height: 1.5;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+      }
+
+      .span-12 { grid-column: span 12; }
+      .span-8 { grid-column: span 8; }
+      .span-6 { grid-column: span 6; }
+      .span-4 { grid-column: span 4; }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 16px;
+      }
+
+      .section-kicker {
+        color: #6b7280;
+      }
+
+      .panel-title {
+        margin-top: 6px;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.05;
+      }
+
+      .panel-copy {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #5a6575;
+        line-height: 1.55;
+      }
+
+      .panel-meta {
+        font-size: 12px;
+        color: #667282;
+      }
+
+      .chart-wrap {
+        position: relative;
+        height: 320px;
+      }
+
+      .chart-wrap.short {
+        height: 280px;
+      }
+
+      .panel-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .family-card,
+      .milestone-card,
+      .list-item,
+      .hotspot-row {
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+      }
+
+      .family-card,
+      .milestone-card {
+        padding: 14px;
+      }
+
+      .family-head,
+      .milestone-head,
+      .list-top,
+      .hotspot-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .family-title,
+      .milestone-title,
+      .list-title,
+      .hotspot-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #111827;
+      }
+
+      .family-metric,
+      .milestone-metric,
+      .hotspot-value {
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      .family-sub,
+      .milestone-sub,
+      .hotspot-sub {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #5c6778;
+        line-height: 1.45;
+      }
+
+      .bar {
+        margin-top: 10px;
+        height: 8px;
+        border-radius: 999px;
+        background: #e6ebdf;
+        overflow: hidden;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--brand-soft), var(--brand));
+      }
+
+      .hotspot-list,
+      .risk-list,
+      .milestone-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .hotspot-row,
+      .list-item {
+        padding: 14px;
+      }
+
+      .hotspot-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        background: #eef2f7;
+        color: #334155;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .risk-list {
+        min-height: 100%;
+      }
+
+      .list-item {
+        display: block;
+      }
+
+      .list-title {
+        line-height: 1.45;
+      }
+
+      .list-sub {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #5f6b7c;
+        line-height: 1.5;
+      }
+
+      .list-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .empty {
+        border-radius: 18px;
+        border: 1px dashed rgba(16, 24, 40, 0.14);
+        background: rgba(255, 255, 255, 0.62);
+        padding: 18px;
+        color: #5b6778;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 1320px) {
+        .metrics {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .filter-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .span-8,
+        .span-6,
+        .span-4 {
+          grid-column: span 12;
+        }
+      }
+
+      @media (max-width: 780px) {
+        .shell {
+          padding: 16px 12px 30px;
+        }
+
+        .hero,
+        .filters,
+        .panel,
+        .metric-card {
+          border-radius: 22px;
+        }
+
+        .metrics,
+        .panel-grid,
+        .filter-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .chart-wrap,
+        .chart-wrap.short {
+          height: 260px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="eyebrow">Shareable Observability Dashboard</div>
+        <h1>Issue Observability</h1>
+        <div class="hero-copy">
+          A shareable snapshot of GitHub issue data optimized for backlog pressure, delivery health,
+          priority risk, and issue activity so leadership can quickly see what is moving and where
+          the team is carrying too much load.
+        </div>
+        <div class="meta-row">
+          <div class="meta-chip" id="repo-meta">Loading repo…</div>
+          <div class="meta-chip" id="generated-meta">Loading snapshot…</div>
+          <div class="meta-chip" id="scope-meta">Observing all issues</div>
+          <button class="action-button" id="refresh-button" type="button">Refresh Data</button>
+        </div>
+      </section>
+
+      <section class="filters">
+        <div class="filter-grid">
+          <div>
+            <div class="filter-label">State</div>
+            <div class="pill-row" id="state-pills"></div>
+          </div>
+          <label>
+            <div class="filter-label">Milestone</div>
+            <select id="milestone-select"></select>
+          </label>
+          <label>
+            <div class="filter-label">Family Focus</div>
+            <select id="family-select"></select>
+          </label>
+          <label>
+            <div class="filter-label">Priority Focus</div>
+            <select id="priority-select"></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="metrics" id="metrics"></section>
+
+      <section class="dashboard-grid">
+        <article class="panel span-8">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Backlog</div>
+              <div class="panel-title">Milestone Load</div>
+              <div class="panel-copy">Open versus closed issue volume by milestone in the current slice.</div>
+            </div>
+            <div class="panel-meta" id="milestone-meta"></div>
+          </div>
+          <div class="chart-wrap" id="milestone-chart-wrap">
+            <canvas id="milestone-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Priority</div>
+              <div class="panel-title">Priority Pressure</div>
+              <div class="panel-copy">Where the open and closed work is concentrating by priority.</div>
+            </div>
+          </div>
+          <div class="chart-wrap short" id="priority-chart-wrap">
+            <canvas id="priority-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Type</div>
+              <div class="panel-title">Issue Mix</div>
+              <div class="panel-copy">How the current slice breaks across bug, enhancement, docs, and support labels.</div>
+            </div>
+          </div>
+          <div class="chart-wrap short" id="type-chart-wrap">
+            <canvas id="type-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-8">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Activity</div>
+              <div class="panel-title">Issue Throughput</div>
+              <div class="panel-copy">Issues opened and closed across the last twelve weeks.</div>
+            </div>
+          </div>
+          <div class="chart-wrap short" id="activity-chart-wrap">
+            <canvas id="activity-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-6">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Areas</div>
+              <div class="panel-title">Top Areas Under Load</div>
+              <div class="panel-copy">The area labels carrying the most open work right now.</div>
+            </div>
+          </div>
+          <div class="chart-wrap" id="areas-chart-wrap">
+            <canvas id="areas-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-6">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Closure Speed</div>
+              <div class="panel-title">Closed Within SLA</div>
+              <div class="panel-copy">Closed tickets that resolved within 24 hours, 7 days, and 30 days.</div>
+            </div>
+          </div>
+          <div class="chart-wrap short" id="closure-speed-chart-wrap">
+            <canvas id="closure-speed-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-6">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Families</div>
+              <div class="panel-title">Family Pressure</div>
+              <div class="panel-copy">At-a-glance pressure by tag family with the hottest label inside each family.</div>
+            </div>
+          </div>
+          <div class="panel-grid" id="family-pressure"></div>
+        </article>
+
+        <article class="panel span-6">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Hotspots</div>
+              <div class="panel-title">Risk Hotspots</div>
+              <div class="panel-copy">Weighted trouble spots across labels, emphasizing open bugs and high priority work.</div>
+            </div>
+          </div>
+          <div class="hotspot-list" id="hotspots"></div>
+        </article>
+
+        <article class="panel span-6">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Watchlist</div>
+              <div class="panel-title">At-Risk Issues</div>
+              <div class="panel-copy">Open issues that should be watched first based on priority, bug status, and recency.</div>
+            </div>
+          </div>
+          <div class="risk-list" id="risk-list"></div>
+        </article>
+
+        <article class="panel span-12">
+          <div class="panel-head">
+            <div>
+              <div class="section-kicker">Delivery</div>
+              <div class="panel-title">Milestone Health</div>
+              <div class="panel-copy">Completion status and backlog mix for every milestone in the current slice.</div>
+            </div>
+          </div>
+          <div class="milestone-list" id="milestone-health"></div>
+        </article>
+      </section>
+    </div>
+
+    <script defer src="./vendor/chart.umd.min.js"></script>
+    <script type="module" src="./issue-graph-app.js?v=1"></script>
+  </body>
+</html>

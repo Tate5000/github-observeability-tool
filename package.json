@@ -1,0 +1,8 @@
+{
+  "name": "github-observeability-tool",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "refresh": "node ./scripts/refresh-data.mjs"
+  }
+}

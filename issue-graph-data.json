@@ -1,0 +1,724 @@
+{
+  "repo": "PRIA-Technologies/skunkworks",
+  "generatedAt": "2026-03-10T15:47:02.897Z",
+  "issues": [
+    {
+      "number": 583,
+      "title": "Bug: Policy Intel Sources — broken or degraded ingestion across 11 sources",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T19:21:59Z",
+      "updatedAt": "2026-03-10T14:03:04Z",
+      "closedAt": null,
+      "labels": [
+        "area:policy-intel",
+        "bug",
+        "priority:P1"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/583"
+    },
+    {
+      "number": 580,
+      "title": "Life Add-On Deep Dive Overhaul — Implementation Plan",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T18:40:30Z",
+      "updatedAt": "2026-03-10T14:03:02Z",
+      "closedAt": null,
+      "labels": [
+        "area:data-scoring",
+        "area:deep-dive",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/580"
+    },
+    {
+      "number": 579,
+      "title": "Replace Hardcoded Values with Real Personalized Insights in Deep Dive Pages",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T18:17:24Z",
+      "updatedAt": "2026-03-09T18:43:30Z",
+      "closedAt": null,
+      "labels": [
+        "area:data-scoring",
+        "area:deep-dive",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/579"
+    },
+    {
+      "number": 578,
+      "title": "Deep Dive pages: Remove Monte Carlo components for unused categories to improve UX",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T18:14:19Z",
+      "updatedAt": "2026-03-09T18:43:31Z",
+      "closedAt": null,
+      "labels": [
+        "area:deep-dive",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/578"
+    },
+    {
+      "number": 577,
+      "title": "Refactor Trade and Tariffs: Remove Monte Carlo, Expand Tariff Features, and Integrate Personal Inflation & Kroger API",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T18:10:34Z",
+      "updatedAt": "2026-03-09T18:43:32Z",
+      "closedAt": null,
+      "labels": [
+        "area:tariffs-trade",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/577"
+    },
+    {
+      "number": 576,
+      "title": "Align 'Strategies to Reduce Exposure' and 'Steps That Strengthen Your Financial Plan' on Deep Dive pages",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T18:07:21Z",
+      "updatedAt": "2026-03-09T18:43:33Z",
+      "closedAt": null,
+      "labels": [
+        "area:deep-dive",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/576"
+    },
+    {
+      "number": 575,
+      "title": "UI Empty State for Effective Tax Rate and State Tax in Tax Deep Dive",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T18:03:59Z",
+      "updatedAt": "2026-03-09T18:43:34Z",
+      "closedAt": null,
+      "labels": [
+        "area:deep-dive",
+        "bug",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/575"
+    },
+    {
+      "number": 574,
+      "title": "Social Security Estimated Amount Not Displayed on Deep Dive Page",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T18:02:35Z",
+      "updatedAt": "2026-03-09T18:43:36Z",
+      "closedAt": null,
+      "labels": [
+        "area:deep-dive",
+        "bug",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/574"
+    },
+    {
+      "number": 573,
+      "title": "Legislator Alignment Score only includes 10 bills – should include all relevant bills",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:49:27Z",
+      "updatedAt": "2026-03-09T18:43:37Z",
+      "closedAt": null,
+      "labels": [
+        "area:data-scoring",
+        "area:legislation",
+        "bug",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/573"
+    },
+    {
+      "number": 572,
+      "title": "Combine both advisor components on my-scan-results page into one",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:48:09Z",
+      "updatedAt": "2026-03-09T18:43:38Z",
+      "closedAt": null,
+      "labels": [
+        "area:my-scan-results",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/572"
+    },
+    {
+      "number": 571,
+      "title": "Validate and calibrate scoring range for bills and Fed Register documents",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:47:46Z",
+      "updatedAt": "2026-03-09T18:43:39Z",
+      "closedAt": null,
+      "labels": [
+        "area:data-scoring",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/571"
+    },
+    {
+      "number": 570,
+      "title": "Fix unreadable assumptions UI on connected-accounts page",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:41:56Z",
+      "updatedAt": "2026-03-09T18:43:41Z",
+      "closedAt": null,
+      "labels": [
+        "area:plaid-financial",
+        "bug",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/570"
+    },
+    {
+      "number": 569,
+      "title": "Show Maximum Plaid Data on Connected Accounts Page for User Transparency",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:40:45Z",
+      "updatedAt": "2026-03-09T18:43:42Z",
+      "closedAt": null,
+      "labels": [
+        "area:plaid-financial",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/569"
+    },
+    {
+      "number": 568,
+      "title": "Activity Page: Update and Reorder Key Policy Deadlines",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:39:23Z",
+      "updatedAt": "2026-03-09T18:43:43Z",
+      "closedAt": null,
+      "labels": [
+        "area:activity-page",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/568"
+    },
+    {
+      "number": 567,
+      "title": "Bug: Some valid addresses do not return legislators (e.g., College Ave, Annapolis & Windy Hill Rd, Atlanta)",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:34:38Z",
+      "updatedAt": "2026-03-09T18:43:44Z",
+      "closedAt": null,
+      "labels": [
+        "area:legislation",
+        "bug",
+        "priority:P1"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/567"
+    },
+    {
+      "number": 566,
+      "title": "Upgrade Policy Watchlist Logic and UI Prioritization",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:32:50Z",
+      "updatedAt": "2026-03-09T18:43:45Z",
+      "closedAt": null,
+      "labels": [
+        "area:policy-watchlist",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/566"
+    },
+    {
+      "number": 565,
+      "title": "Incorrect link behavior for '3 things you can do right now' on my-scan-results page",
+      "state": "CLOSED",
+      "createdAt": "2026-03-09T17:14:02Z",
+      "updatedAt": "2026-03-09T19:07:32Z",
+      "closedAt": "2026-03-09T19:06:57Z",
+      "labels": [
+        "area:my-scan-results",
+        "bug",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/565"
+    },
+    {
+      "number": 564,
+      "title": "Playwright browser binaries missing in Vercel deployment (works locally): `[GET /api/scan-report/pdf]` fails",
+      "state": "CLOSED",
+      "createdAt": "2026-03-09T17:08:16Z",
+      "updatedAt": "2026-03-10T13:56:11Z",
+      "closedAt": "2026-03-10T13:27:24Z",
+      "labels": [
+        "area:infra-devops",
+        "area:my-scan-results",
+        "bug",
+        "priority:P0"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/564"
+    },
+    {
+      "number": 563,
+      "title": "Fix Vercel output parsing and runtime timeout errors on my-scan-results page",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T17:06:03Z",
+      "updatedAt": "2026-03-10T13:46:34Z",
+      "closedAt": null,
+      "labels": [
+        "area:my-scan-results",
+        "bug",
+        "priority:P0"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/563"
+    },
+    {
+      "number": 562,
+      "title": "Personalization: Restrict action items on action page based on user context",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T16:59:29Z",
+      "updatedAt": "2026-03-09T18:43:50Z",
+      "closedAt": null,
+      "labels": [
+        "area:activity-page",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.3 - Production Hardening and Personalization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/562"
+    },
+    {
+      "number": 561,
+      "title": "Fix referral process: referral link should land on pre-checkout page displaying $50 off and apply Stripe discount code",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T16:36:42Z",
+      "updatedAt": "2026-03-09T18:43:51Z",
+      "closedAt": null,
+      "labels": [
+        "area:billing-checkout",
+        "enhancement",
+        "priority:P0"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/561"
+    },
+    {
+      "number": 560,
+      "title": "Change Plaid from sandbox to production and ensure secure, correct integration of data and webhooks",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T16:34:04Z",
+      "updatedAt": "2026-03-09T18:43:53Z",
+      "closedAt": null,
+      "labels": [
+        "area:plaid-financial",
+        "enhancement",
+        "priority:P0"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/560"
+    },
+    {
+      "number": 559,
+      "title": "Update Stripe Checkout Branding and Switch to Production Environment for claude/audit-math-calculations-L1goV",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T16:32:12Z",
+      "updatedAt": "2026-03-09T18:43:54Z",
+      "closedAt": null,
+      "labels": [
+        "area:billing-checkout",
+        "enhancement",
+        "priority:P0"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/559"
+    },
+    {
+      "number": 558,
+      "title": "Fix incorrect policy impact calculations on Activity page (claude/audit-math-calculations-L1goV)",
+      "state": "OPEN",
+      "createdAt": "2026-03-09T16:30:16Z",
+      "updatedAt": "2026-03-09T18:43:55Z",
+      "closedAt": null,
+      "labels": [
+        "area:activity-page",
+        "area:data-scoring",
+        "bug",
+        "priority:P0"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/558"
+    },
+    {
+      "number": 557,
+      "title": "Fix auto-triggering of Federal Register scoring on claude/audit-math-calculations-L1goV branch",
+      "state": "CLOSED",
+      "createdAt": "2026-03-09T16:28:11Z",
+      "updatedAt": "2026-03-10T13:31:06Z",
+      "closedAt": "2026-03-09T19:35:50Z",
+      "labels": [
+        "area:data-scoring",
+        "bug",
+        "priority:P0"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/557"
+    },
+    {
+      "number": 556,
+      "title": "Get new repo to stage and cherry pick lost features",
+      "state": "CLOSED",
+      "createdAt": "2026-03-09T15:55:24Z",
+      "updatedAt": "2026-03-10T14:03:06Z",
+      "closedAt": "2026-03-09T18:28:09Z",
+      "labels": [
+        "area:infra-devops",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/556"
+    },
+    {
+      "number": 547,
+      "title": "Update deprecated dependencies",
+      "state": "OPEN",
+      "createdAt": "2026-03-06T00:51:51Z",
+      "updatedAt": "2026-03-09T18:43:58Z",
+      "closedAt": null,
+      "labels": [
+        "area:infra-devops",
+        "dependencies",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/547"
+    },
+    {
+      "number": 540,
+      "title": "chore: Replace all new Pool() with getDBPool() singleton",
+      "state": "OPEN",
+      "createdAt": "2026-03-05T15:09:22Z",
+      "updatedAt": "2026-03-09T18:43:59Z",
+      "closedAt": null,
+      "labels": [
+        "area:infra-devops",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/540"
+    },
+    {
+      "number": 538,
+      "title": "Add Dynamic OpenGraph Images With PRIA Branding, Serverless Asset Bundling, and Middleware Updates",
+      "state": "CLOSED",
+      "createdAt": "2026-03-05T14:47:44Z",
+      "updatedAt": "2026-03-10T14:03:08Z",
+      "closedAt": "2026-03-05T14:49:31Z",
+      "labels": [
+        "area:infra-devops",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/538"
+    },
+    {
+      "number": 535,
+      "title": "DEFCON calculation functionality",
+      "state": "CLOSED",
+      "createdAt": "2026-03-04T18:34:28Z",
+      "updatedAt": "2026-03-10T14:03:33Z",
+      "closedAt": "2026-03-05T23:59:15Z",
+      "labels": [
+        "area:data-scoring",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/535"
+    },
+    {
+      "number": 534,
+      "title": "Show sponsor/cosponsor photos and latest bill actions on Bill page",
+      "state": "OPEN",
+      "createdAt": "2026-03-04T18:21:31Z",
+      "updatedAt": "2026-03-09T18:44:00Z",
+      "closedAt": null,
+      "labels": [
+        "area:legislation",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/534"
+    },
+    {
+      "number": 533,
+      "title": "Add bill action breadcrumbs below summary on Bill page",
+      "state": "OPEN",
+      "createdAt": "2026-03-04T18:21:30Z",
+      "updatedAt": "2026-03-09T18:44:01Z",
+      "closedAt": null,
+      "labels": [
+        "area:legislation",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/533"
+    },
+    {
+      "number": 530,
+      "title": "Policy Intel Fixes",
+      "state": "CLOSED",
+      "createdAt": "2026-03-04T02:14:37Z",
+      "updatedAt": "2026-03-10T14:03:35Z",
+      "closedAt": "2026-03-05T18:15:31Z",
+      "labels": [
+        "area:policy-intel",
+        "bug",
+        "priority:P1"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/530"
+    },
+    {
+      "number": 525,
+      "title": "PRIA Score Graphs",
+      "state": "CLOSED",
+      "createdAt": "2026-03-03T20:06:20Z",
+      "updatedAt": "2026-03-10T14:03:37Z",
+      "closedAt": "2026-03-05T23:59:16Z",
+      "labels": [
+        "area:data-scoring",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/525"
+    },
+    {
+      "number": 520,
+      "title": "Refine CI/CD Pipelines and Deployment Processes",
+      "state": "OPEN",
+      "createdAt": "2026-03-03T17:18:50Z",
+      "updatedAt": "2026-03-10T14:03:39Z",
+      "closedAt": null,
+      "labels": [
+        "area:infra-devops",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/520"
+    },
+    {
+      "number": 513,
+      "title": "Monte Carlo Visual",
+      "state": "CLOSED",
+      "createdAt": "2026-03-03T15:14:51Z",
+      "updatedAt": "2026-03-10T14:03:40Z",
+      "closedAt": "2026-03-05T14:30:01Z",
+      "labels": [
+        "area:data-scoring",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/513"
+    },
+    {
+      "number": 511,
+      "title": "Comprehensive repository cleanup: Remove old files, obsolete Trigger.dev events, Clerk users & stale DB tables",
+      "state": "OPEN",
+      "createdAt": "2026-03-03T14:15:01Z",
+      "updatedAt": "2026-03-09T18:44:04Z",
+      "closedAt": null,
+      "labels": [
+        "area:infra-devops",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/511"
+    },
+    {
+      "number": 506,
+      "title": "Neon IP Whitelisting & PII Data Masking on Main Branch",
+      "state": "OPEN",
+      "createdAt": "2026-03-02T20:18:53Z",
+      "updatedAt": "2026-03-09T18:44:05Z",
+      "closedAt": null,
+      "labels": [
+        "area:security",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/506"
+    },
+    {
+      "number": 487,
+      "title": "Kroger API Integration: Real-Time Grocery Price Tracker with Household-Adjusted Cost Slider",
+      "state": "OPEN",
+      "createdAt": "2026-02-25T21:41:44Z",
+      "updatedAt": "2026-03-09T18:44:07Z",
+      "closedAt": null,
+      "labels": [
+        "area:tariffs-trade",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.2 - Launch Stabilization",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/487"
+    },
+    {
+      "number": 475,
+      "title": "Polymarket API Integration for Real-Time Context and Risk Signals: Feasibility, Use Cases, and Action Plan",
+      "state": "CLOSED",
+      "createdAt": "2026-02-25T14:06:08Z",
+      "updatedAt": "2026-03-10T14:03:42Z",
+      "closedAt": "2026-03-05T14:47:09Z",
+      "labels": [
+        "area:data-scoring",
+        "enhancement",
+        "priority:P3"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/475"
+    },
+    {
+      "number": 474,
+      "title": "Evaluate Polymarket API Integration for Context Enrichment and Risk Signals",
+      "state": "CLOSED",
+      "createdAt": "2026-02-25T14:05:49Z",
+      "updatedAt": "2026-03-10T14:03:44Z",
+      "closedAt": "2026-02-25T14:06:33Z",
+      "labels": [
+        "area:data-scoring",
+        "duplicate",
+        "enhancement",
+        "priority:P3"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/474"
+    },
+    {
+      "number": 462,
+      "title": "Ship high-recall multi-agent retrieval + faithfulness pipeline",
+      "state": "CLOSED",
+      "createdAt": "2026-02-19T13:52:07Z",
+      "updatedAt": "2026-03-10T14:03:46Z",
+      "closedAt": "2026-02-26T19:34:41Z",
+      "labels": [
+        "area:agent-platform",
+        "documentation",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/462"
+    },
+    {
+      "number": 445,
+      "title": "Build PaineBot (Social Post Recommendation Agent)",
+      "state": "CLOSED",
+      "createdAt": "2026-02-17T14:29:58Z",
+      "updatedAt": "2026-03-10T14:03:48Z",
+      "closedAt": "2026-03-05T15:56:06Z",
+      "labels": [
+        "area:agent-platform",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/445"
+    },
+    {
+      "number": 444,
+      "title": "Harden and Complete Alerts Feature (Daily/Rolling Manifests)",
+      "state": "CLOSED",
+      "createdAt": "2026-02-17T14:23:17Z",
+      "updatedAt": "2026-03-10T14:03:49Z",
+      "closedAt": "2026-03-06T01:11:09Z",
+      "labels": [
+        "area:agent-platform",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/444"
+    },
+    {
+      "number": 443,
+      "title": "Finalize Common Agent Backend Architecture",
+      "state": "CLOSED",
+      "createdAt": "2026-02-17T14:21:19Z",
+      "updatedAt": "2026-03-10T14:03:51Z",
+      "closedAt": "2026-03-03T14:00:28Z",
+      "labels": [
+        "area:agent-platform",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/443"
+    },
+    {
+      "number": 442,
+      "title": "Build RevreBot (Internal Policy Intelligence)",
+      "state": "CLOSED",
+      "createdAt": "2026-02-17T13:29:11Z",
+      "updatedAt": "2026-03-10T14:03:53Z",
+      "closedAt": "2026-03-05T15:56:04Z",
+      "labels": [
+        "area:agent-platform",
+        "enhancement",
+        "priority:P1"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/442"
+    },
+    {
+      "number": 441,
+      "title": "Implement Alerts Feature",
+      "state": "CLOSED",
+      "createdAt": "2026-02-17T13:27:19Z",
+      "updatedAt": "2026-03-10T14:03:56Z",
+      "closedAt": "2026-02-17T14:29:25Z",
+      "labels": [
+        "area:agent-platform",
+        "enhancement",
+        "priority:P2"
+      ],
+      "milestone": "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+      "url": "https://github.com/PRIA-Technologies/skunkworks/issues/441"
+    }
+  ],
+  "milestones": [
+    "V1.1 — Agent Infrastructure & Scoring Visualization (Completed 3/5/2026/)🫡",
+    "V1.2 - Launch Stabilization",
+    "V1.3 - Production Hardening and Personalization"
+  ]
+}

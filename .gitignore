@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+.env
+.env.*
+.vercel/
+dist/
+coverage/
+*.log
+*.pem
+*.key
+*.p12
+*.crt
