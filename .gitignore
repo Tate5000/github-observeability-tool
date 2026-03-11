@@ -11,3 +11,5 @@ coverage/
 *.key
 *.p12
 *.crt
+.vercel
+.env*.local
