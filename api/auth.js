@@ -69,18 +69,8 @@ function methodNotAllowed() {
   return Response.json({ error: 'Method not allowed.' }, { status: 405 });
 }
 
-export async function POST(request) {
-  return handleLogin(request);
+export default async function handler(request) {
+  if (request.method === 'POST') return handleLogin(request);
+  if (request.method === 'DELETE') return handleLogout();
+  return methodNotAllowed();
 }
-
-export async function DELETE() {
-  return handleLogout();
-}
-
-export default {
-  fetch(request) {
-    if (request.method === 'POST') return handleLogin(request);
-    if (request.method === 'DELETE') return handleLogout();
-    return methodNotAllowed();
-  },
-};

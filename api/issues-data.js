@@ -131,12 +131,6 @@ async function handleRequest(request) {
   }
 }
 
-export async function GET(request) {
+export default async function handler(request) {
   return handleRequest(request);
 }
-
-export default {
-  fetch(request) {
-    return handleRequest(request);
-  },
-};
