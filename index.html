@@ -143,16 +143,15 @@
 
       .command-header {
         display: grid;
-        grid-template-columns: minmax(320px, 1.08fr) minmax(0, 1.92fr);
-        gap: 14px;
-        padding: 18px 20px;
+        grid-template-columns: minmax(280px, 0.9fr) minmax(0, 2.1fr);
+        gap: 10px;
+        padding: 12px 14px;
       }
 
       .eyebrow,
       .status-label,
       .filter-label,
       .metric-label,
-      .panel-kicker,
       .badge,
       .pill,
       .panel-meta {
@@ -164,57 +163,27 @@
       }
 
       .brand-block {
-        display: grid;
-        gap: 10px;
-        align-content: center;
-      }
-
-      .eyebrow {
-        display: inline-flex;
+        min-width: 0;
+        display: flex;
         align-items: center;
-        gap: 8px;
-        width: fit-content;
-        padding: 8px 12px;
-        border-radius: 999px;
-        border: 1px solid rgba(214, 255, 114, 0.26);
-        background: rgba(214, 255, 114, 0.08);
-        color: #e4ff9d;
-      }
-
-      .eyebrow::before {
-        content: "";
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: radial-gradient(circle, #d6ff72 0%, rgba(214, 255, 114, 0.3) 72%);
-        box-shadow: 0 0 14px rgba(214, 255, 114, 0.52);
       }
 
       .headline {
-        display: grid;
-        gap: 10px;
+        min-width: 0;
       }
 
       h1 {
         margin: 0;
         font-family: "Space Grotesk", sans-serif;
-        font-size: clamp(34px, 4vw, 56px);
-        line-height: 0.92;
+        font-size: clamp(24px, 2.2vw, 36px);
+        line-height: 0.96;
         letter-spacing: -0.06em;
-      }
-
-      .command-copy {
-        margin: 0;
-        max-width: 56ch;
-        font-size: 14px;
-        line-height: 1.5;
-        color: #93aba2;
       }
 
       .status-bank {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
+        gap: 10px;
         min-width: 0;
       }
 
@@ -222,9 +191,9 @@
         position: relative;
         min-width: 0;
         display: grid;
-        gap: 8px;
-        padding: 14px 16px;
-        border-radius: 18px;
+        gap: 6px;
+        padding: 10px 12px;
+        border-radius: 16px;
         border: 1px solid var(--line);
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
       }
@@ -242,31 +211,31 @@
 
       .status-value {
         min-width: 0;
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 700;
-        line-height: 1.15;
+        line-height: 1.1;
         color: #f6fff9;
       }
 
       .status-value.mono {
         font-family: "IBM Plex Mono", monospace;
-        font-size: clamp(20px, 1.9vw, 28px);
+        font-size: clamp(16px, 1.4vw, 22px);
         font-weight: 500;
         letter-spacing: 0.06em;
       }
 
       .status-sub {
         min-width: 0;
-        font-size: 12px;
-        line-height: 1.45;
+        font-size: 11px;
+        line-height: 1.35;
         color: #89a39a;
       }
 
       .action-button {
         appearance: none;
         border: 1px solid rgba(214, 255, 114, 0.28);
-        border-radius: 18px;
-        padding: 14px 16px;
+        border-radius: 16px;
+        padding: 10px 14px;
         cursor: pointer;
         font-family: "IBM Plex Mono", monospace;
         font-size: 11px;
@@ -294,7 +263,7 @@
       }
 
       .filters {
-        padding: 12px 14px;
+        padding: 10px 12px;
       }
 
       .filter-grid {
@@ -342,7 +311,7 @@
 
       select {
         width: 100%;
-        height: 44px;
+        height: 40px;
         padding: 0 14px;
         border-radius: 14px;
         border: 1px solid var(--line);
@@ -357,7 +326,7 @@
       }
 
       .metric-card {
-        padding: 14px 16px 16px;
+        padding: 12px 14px 14px;
         isolation: isolate;
       }
 
@@ -388,18 +357,18 @@
       }
 
       .metric-value {
-        margin-top: 10px;
+        margin-top: 8px;
         font-family: "Space Grotesk", sans-serif;
-        font-size: clamp(28px, 2.5vw, 40px);
+        font-size: clamp(24px, 2.1vw, 34px);
         font-weight: 700;
         line-height: 1;
         color: #f8fff9;
       }
 
       .metric-sub {
-        margin-top: 8px;
-        font-size: 12px;
-        line-height: 1.45;
+        margin-top: 6px;
+        font-size: 11px;
+        line-height: 1.35;
         color: #7c948b;
       }
 
@@ -432,39 +401,27 @@
         min-height: 0;
         display: flex;
         flex-direction: column;
-        padding: 14px 16px 16px;
+        padding: 10px 12px 12px;
       }
 
       .panel-head {
         display: flex;
         justify-content: space-between;
-        gap: 12px;
-        align-items: flex-start;
-        margin-bottom: 12px;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 6px;
       }
 
       .panel-head > div:first-child {
         min-width: 0;
       }
 
-      .panel-kicker {
-        color: #7a9389;
-      }
-
       .panel-title {
-        margin-top: 6px;
         font-family: "Space Grotesk", sans-serif;
-        font-size: clamp(20px, 2vw, 28px);
+        font-size: clamp(16px, 1.35vw, 24px);
         line-height: 1;
         letter-spacing: -0.04em;
         color: #f7fff9;
-      }
-
-      .panel-copy {
-        margin-top: 6px;
-        font-size: 12px;
-        line-height: 1.45;
-        color: #7c948b;
       }
 
       .panel-meta {
@@ -547,9 +504,9 @@
       .hotspot-sub,
       .list-sub,
       .milestone-sub {
-        margin-top: 6px;
-        font-size: 12px;
-        line-height: 1.45;
+        margin-top: 4px;
+        font-size: 11px;
+        line-height: 1.35;
         color: #80978f;
       }
 
@@ -646,8 +603,8 @@
         }
 
         .dashboard-grid {
-          height: calc(100vh - 460px);
-          grid-template-rows: 0.94fr 0.9fr 0.86fr 1.3fr;
+          height: calc(100vh - 332px);
+          grid-template-rows: 1fr 1fr 0.92fr 1.18fr;
         }
       }
 
@@ -721,13 +678,8 @@
     <div class="shell">
       <section class="command-header">
         <div class="brand-block">
-          <div class="eyebrow">GitHub Mission Control</div>
           <div class="headline">
             <h1>Issue Command Deck</h1>
-            <p class="command-copy">
-              One-screen tactical view of backlog pressure, delivery velocity, milestone drift, and
-              issue hotspots for a 55-inch wall display.
-            </p>
           </div>
         </div>
 
@@ -784,9 +736,7 @@
         <article class="panel span-8">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Backlog Pressure</div>
               <div class="panel-title">Milestone Load</div>
-              <div class="panel-copy">Open versus closed issue volume by milestone in the current slice.</div>
             </div>
             <div class="panel-meta" id="milestone-meta"></div>
           </div>
@@ -798,9 +748,7 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Priority Heat</div>
               <div class="panel-title">Priority Pressure</div>
-              <div class="panel-copy">Where the open and closed work is concentrating by priority.</div>
             </div>
           </div>
           <div class="chart-wrap">
@@ -811,9 +759,7 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Backlog Drift</div>
               <div class="panel-title">Aging Pressure</div>
-              <div class="panel-copy">Open issue age bands so stale work stands out immediately.</div>
             </div>
             <div class="panel-meta" id="aging-meta"></div>
           </div>
@@ -825,9 +771,7 @@
         <article class="panel span-6">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Delivery Tempo</div>
               <div class="panel-title">Issue Throughput</div>
-              <div class="panel-copy">Issues opened and closed across the last twelve weeks.</div>
             </div>
           </div>
           <div class="chart-wrap">
@@ -838,9 +782,7 @@
         <article class="panel span-6">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Flow</div>
               <div class="panel-title">Burn-up Trend</div>
-              <div class="panel-copy">Total scope, completed scope, and remaining backlog across the last twelve weeks.</div>
             </div>
           </div>
           <div class="chart-wrap">
@@ -851,9 +793,7 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Composition</div>
               <div class="panel-title">Issue Mix</div>
-              <div class="panel-copy">How the current slice breaks across bugs, enhancements, docs, and support.</div>
             </div>
           </div>
           <div class="chart-wrap">
@@ -864,9 +804,7 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Area Load</div>
               <div class="panel-title">Top Areas Under Load</div>
-              <div class="panel-copy">Area labels carrying the most open work right now.</div>
             </div>
           </div>
           <div class="chart-wrap">
@@ -877,9 +815,7 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Resolution Speed</div>
               <div class="panel-title">Closed Within SLA</div>
-              <div class="panel-copy">Closed tickets that resolved within 24 hours, 7 days, and 30 days.</div>
             </div>
           </div>
           <div class="chart-wrap">
@@ -890,9 +826,7 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Tag Families</div>
               <div class="panel-title">Family Pressure</div>
-              <div class="panel-copy">Pressure by label family with the hottest tag inside each band.</div>
             </div>
           </div>
           <div class="scroll-pane" id="family-pressure" data-auto-scroll="family-pressure"></div>
@@ -901,9 +835,7 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Weighted Signal</div>
               <div class="panel-title">Risk Hotspots</div>
-              <div class="panel-copy">Labels with the most pressure from open bugs and high-priority work.</div>
             </div>
           </div>
           <div class="scroll-pane hotspot-list" id="hotspots" data-auto-scroll="hotspots"></div>
@@ -912,9 +844,7 @@
         <article class="panel span-8">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Watchlist</div>
               <div class="panel-title">At-Risk Issues</div>
-              <div class="panel-copy">Open issues that should be watched first based on priority, bug status, and age.</div>
             </div>
           </div>
           <div class="scroll-pane risk-list" id="risk-list" data-auto-scroll="risk-list"></div>
@@ -923,9 +853,7 @@
         <article class="panel span-8">
           <div class="panel-head">
             <div>
-              <div class="panel-kicker">Delivery Cadence</div>
               <div class="panel-title">Milestone Health</div>
-              <div class="panel-copy">Completion status and backlog mix for every milestone in the current slice.</div>
             </div>
           </div>
           <div class="scroll-pane milestone-list" id="milestone-health" data-auto-scroll="milestone-health"></div>
