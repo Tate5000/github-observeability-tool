@@ -3,34 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Issue Observability Dashboard</title>
+    <title>Issue Command Deck</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --page: #040806;
-        --page-soft: #0b1310;
-        --panel: rgba(10, 16, 14, 0.86);
-        --panel-strong: rgba(14, 22, 19, 0.96);
-        --ink: #eff8f2;
-        --muted: #90a29b;
-        --line: rgba(146, 168, 159, 0.12);
-        --line-strong: rgba(188, 212, 201, 0.18);
-        --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+        --page: #030604;
+        --page-soft: #08110d;
+        --surface: rgba(7, 12, 10, 0.9);
+        --surface-strong: rgba(10, 17, 14, 0.96);
+        --surface-bright: rgba(19, 31, 26, 0.94);
+        --ink: #f3fbf7;
+        --muted: #89a39a;
+        --line: rgba(140, 167, 155, 0.14);
+        --line-strong: rgba(176, 208, 195, 0.22);
+        --glow: 0 18px 60px rgba(0, 0, 0, 0.36);
         --brand: #d6ff72;
-        --brand-soft: #74d8ff;
-        --brand-warm: #ffb25b;
-        --bug: #ff7b78;
-        --enhancement: #86f5c6;
-        --priority: #ff9d52;
-        --area: #6cc9ff;
-        --support: #b59cff;
-        --success: #7fff9f;
-        --danger: #ff5f5f;
+        --brand-cool: #63d9ff;
+        --brand-warm: #ffba68;
+        --success: #7dffa9;
+        --danger: #ff7c6d;
+        --warning: #ffb76c;
+        --violet: #b299ff;
       }
 
       * {
@@ -45,12 +43,13 @@
         margin: 0;
         min-height: 100vh;
         position: relative;
+        overflow-x: hidden;
         font-family: "Instrument Sans", "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          radial-gradient(circle at 18% 0%, rgba(214, 255, 114, 0.12), transparent 28%),
-          radial-gradient(circle at 82% 6%, rgba(116, 216, 255, 0.14), transparent 26%),
-          radial-gradient(circle at 80% 100%, rgba(255, 178, 91, 0.09), transparent 24%),
+          radial-gradient(circle at 16% 0%, rgba(214, 255, 114, 0.14), transparent 24%),
+          radial-gradient(circle at 84% 6%, rgba(99, 217, 255, 0.14), transparent 24%),
+          radial-gradient(circle at 78% 100%, rgba(255, 186, 104, 0.1), transparent 26%),
           linear-gradient(180deg, var(--page) 0%, var(--page-soft) 100%);
       }
 
@@ -63,18 +62,18 @@
       }
 
       body::before {
-        opacity: 0.3;
+        opacity: 0.26;
         background:
-          linear-gradient(rgba(151, 174, 164, 0.08) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(151, 174, 164, 0.08) 1px, transparent 1px);
-        background-size: 112px 112px;
-        mask-image: radial-gradient(circle at center, black 46%, transparent 100%);
+          linear-gradient(rgba(133, 157, 146, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(133, 157, 146, 0.08) 1px, transparent 1px);
+        background-size: 88px 88px;
+        mask-image: radial-gradient(circle at center, black 56%, transparent 100%);
       }
 
       body::after {
         background:
-          radial-gradient(circle at center, rgba(255, 255, 255, 0.03), transparent 48%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 20%, transparent 80%, rgba(255, 255, 255, 0.02));
+          linear-gradient(180deg, rgba(255, 255, 255, 0.028), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.02)),
+          radial-gradient(circle at center, rgba(255, 255, 255, 0.025), transparent 46%);
       }
 
       button,
@@ -89,142 +88,229 @@
 
       .shell {
         position: relative;
-        max-width: 1820px;
+        z-index: 1;
+        max-width: 1980px;
         margin: 0 auto;
-        padding: 26px 20px 42px;
+        padding: 14px;
+        display: grid;
+        gap: 12px;
       }
 
-      .hero,
+      .command-header,
       .filters,
-      .panel,
-      .metric-card {
-        border-radius: 24px;
+      .metric-card,
+      .panel {
+        position: relative;
+        overflow: hidden;
         border: 1px solid var(--line);
-        background: linear-gradient(180deg, rgba(11, 18, 15, 0.9), rgba(6, 11, 9, 0.96));
-        box-shadow: var(--shadow);
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(9, 15, 12, 0.92), rgba(5, 10, 8, 0.97));
+        box-shadow: var(--glow);
         backdrop-filter: blur(18px);
       }
 
-      .hero {
-        position: relative;
-        overflow: hidden;
-        padding: 34px;
-        background:
-          linear-gradient(140deg, rgba(13, 20, 17, 0.97), rgba(7, 11, 9, 0.94)),
-          radial-gradient(circle at top right, rgba(214, 255, 114, 0.14), transparent 24%),
-          radial-gradient(circle at 24% 0%, rgba(116, 216, 255, 0.14), transparent 24%);
-      }
-
-      .hero::after {
+      .command-header::before,
+      .filters::before,
+      .panel::before {
         content: "";
         position: absolute;
         inset: 0;
-        background:
-          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0, transparent 14%, transparent 86%, rgba(255, 255, 255, 0.02) 100%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 24%);
         pointer-events: none;
+        background:
+          linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 16%, transparent 84%, rgba(255, 255, 255, 0.04)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 18%);
+      }
+
+      .command-header::after,
+      .panel::after {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border: 1px solid rgba(214, 255, 114, 0.06);
+        border-radius: 18px;
+        pointer-events: none;
+        mask:
+          linear-gradient(#000 0 0) top left / 28px 1px no-repeat,
+          linear-gradient(#000 0 0) top left / 1px 28px no-repeat,
+          linear-gradient(#000 0 0) top right / 28px 1px no-repeat,
+          linear-gradient(#000 0 0) top right / 1px 28px no-repeat,
+          linear-gradient(#000 0 0) bottom left / 28px 1px no-repeat,
+          linear-gradient(#000 0 0) bottom left / 1px 28px no-repeat,
+          linear-gradient(#000 0 0) bottom right / 28px 1px no-repeat,
+          linear-gradient(#000 0 0) bottom right / 1px 28px no-repeat;
+        mask-repeat: no-repeat;
+      }
+
+      .command-header {
+        display: grid;
+        grid-template-columns: minmax(320px, 1.08fr) minmax(0, 1.92fr);
+        gap: 14px;
+        padding: 18px 20px;
       }
 
       .eyebrow,
-      .meta-chip,
+      .status-label,
       .filter-label,
-      .section-kicker,
       .metric-label,
-      .pill {
-        font-family: "Space Grotesk", sans-serif;
+      .panel-kicker,
+      .badge,
+      .pill,
+      .panel-meta {
+        font-family: "IBM Plex Mono", monospace;
         font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 0.24em;
+        font-weight: 600;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
+      }
+
+      .brand-block {
+        display: grid;
+        gap: 10px;
+        align-content: center;
       }
 
       .eyebrow {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 9px 13px;
+        width: fit-content;
+        padding: 8px 12px;
         border-radius: 999px;
-        border: 1px solid rgba(214, 255, 114, 0.24);
+        border: 1px solid rgba(214, 255, 114, 0.26);
         background: rgba(214, 255, 114, 0.08);
-        color: #d9f992;
+        color: #e4ff9d;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #d6ff72 0%, rgba(214, 255, 114, 0.3) 72%);
+        box-shadow: 0 0 14px rgba(214, 255, 114, 0.52);
+      }
+
+      .headline {
+        display: grid;
+        gap: 10px;
       }
 
       h1 {
-        position: relative;
-        z-index: 1;
-        margin: 22px 0 12px;
-        max-width: 10ch;
+        margin: 0;
         font-family: "Space Grotesk", sans-serif;
-        font-size: clamp(48px, 6vw, 92px);
-        font-weight: 700;
-        line-height: 0.88;
+        font-size: clamp(34px, 4vw, 56px);
+        line-height: 0.92;
         letter-spacing: -0.06em;
       }
 
-      .hero-copy {
-        position: relative;
-        z-index: 1;
-        max-width: 980px;
-        font-size: 17px;
-        line-height: 1.68;
-        color: #a3b3ab;
+      .command-copy {
+        margin: 0;
+        max-width: 56ch;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #93aba2;
       }
 
-      .meta-row {
-        display: flex;
-        flex-wrap: wrap;
+      .status-bank {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
-        margin-top: 22px;
+        min-width: 0;
       }
 
-      .meta-chip,
-      .action-button,
-      .pill {
-        border-radius: 999px;
+      .status-card {
+        position: relative;
+        min-width: 0;
+        display: grid;
+        gap: 8px;
+        padding: 14px 16px;
+        border-radius: 18px;
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.035);
-        color: #d9e5df;
-        padding: 11px 15px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+      }
+
+      .status-card.primary {
+        border-color: rgba(214, 255, 114, 0.2);
+        background:
+          radial-gradient(circle at top right, rgba(214, 255, 114, 0.1), transparent 36%),
+          linear-gradient(180deg, rgba(21, 33, 28, 0.95), rgba(9, 15, 13, 0.95));
+      }
+
+      .status-label {
+        color: #7b948b;
+      }
+
+      .status-value {
+        min-width: 0;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.15;
+        color: #f6fff9;
+      }
+
+      .status-value.mono {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: clamp(20px, 1.9vw, 28px);
+        font-weight: 500;
+        letter-spacing: 0.06em;
+      }
+
+      .status-sub {
+        min-width: 0;
+        font-size: 12px;
+        line-height: 1.45;
+        color: #89a39a;
       }
 
       .action-button {
+        appearance: none;
+        border: 1px solid rgba(214, 255, 114, 0.28);
+        border-radius: 18px;
+        padding: 14px 16px;
         cursor: pointer;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.16em;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
-        background: linear-gradient(180deg, rgba(214, 255, 114, 0.16), rgba(214, 255, 114, 0.08));
-        color: #f6ffd8;
-        border-color: rgba(214, 255, 114, 0.28);
-        transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
-      }
-
-      .action-button:hover,
-      .pill:hover {
-        transform: translateY(-1px);
-        border-color: rgba(214, 255, 114, 0.42);
+        color: #f3ffd2;
+        background:
+          radial-gradient(circle at top, rgba(214, 255, 114, 0.16), transparent 46%),
+          linear-gradient(180deg, rgba(214, 255, 114, 0.13), rgba(214, 255, 114, 0.07));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
       }
 
       .action-button:hover {
-        box-shadow: 0 0 0 1px rgba(214, 255, 114, 0.12), 0 14px 30px rgba(0, 0, 0, 0.35);
+        transform: translateY(-1px);
+        border-color: rgba(214, 255, 114, 0.42);
+        box-shadow: 0 0 0 1px rgba(214, 255, 114, 0.1), 0 12px 28px rgba(0, 0, 0, 0.28);
+      }
+
+      .action-button:disabled {
+        cursor: wait;
+        opacity: 0.68;
+        transform: none;
       }
 
       .filters {
-        margin-top: 18px;
-        padding: 18px 20px;
+        padding: 12px 14px;
       }
 
       .filter-grid {
         display: grid;
-        grid-template-columns: 1.25fr 1fr 1fr auto;
-        gap: 14px;
+        grid-template-columns: 1.7fr 1fr 1fr 1fr;
+        gap: 12px;
         align-items: end;
       }
 
+      .filter-block {
+        min-width: 0;
+      }
+
       .filter-label {
-        color: #7f928a;
-        margin-bottom: 10px;
+        color: #7f988f;
+        margin-bottom: 8px;
       }
 
       .pill-row {
@@ -235,35 +321,44 @@
 
       .pill {
         cursor: pointer;
-        font-size: 12px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.035);
+        color: #d9e8e1;
+        transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+      }
+
+      .pill:hover {
+        transform: translateY(-1px);
+        border-color: rgba(214, 255, 114, 0.3);
       }
 
       .pill.active {
-        background: rgba(214, 255, 114, 0.14);
         border-color: rgba(214, 255, 114, 0.3);
-        color: #f3ffd4;
+        background: rgba(214, 255, 114, 0.1);
+        color: #efffc4;
       }
 
       select {
         width: 100%;
+        height: 44px;
+        padding: 0 14px;
         border-radius: 14px;
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.04);
-        color: #edf5f0;
-        padding: 13px 14px;
+        background: rgba(255, 255, 255, 0.045);
+        color: var(--ink);
       }
 
       .metrics {
         display: grid;
         grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 18px;
+        gap: 12px;
       }
 
       .metric-card {
-        position: relative;
-        overflow: hidden;
-        padding: 18px 18px 20px;
+        padding: 14px 16px 16px;
+        isolation: isolate;
       }
 
       .metric-card::before {
@@ -272,148 +367,195 @@
         inset: 0 auto auto 0;
         width: 100%;
         height: 3px;
-        background: linear-gradient(90deg, var(--brand), var(--brand-soft) 36%, transparent 82%);
+        pointer-events: none;
+        background: linear-gradient(90deg, var(--brand-cool), var(--brand), transparent 78%);
+      }
+
+      .metric-card[data-tone="good"]::before {
+        background: linear-gradient(90deg, var(--success), var(--brand), transparent 78%);
+      }
+
+      .metric-card[data-tone="watch"]::before {
+        background: linear-gradient(90deg, var(--brand-cool), var(--warning), transparent 78%);
+      }
+
+      .metric-card[data-tone="alert"]::before {
+        background: linear-gradient(90deg, var(--danger), var(--warning), transparent 78%);
       }
 
       .metric-label {
-        color: #7f928a;
+        color: #7e958c;
       }
 
       .metric-value {
         margin-top: 10px;
         font-family: "Space Grotesk", sans-serif;
-        font-size: 36px;
-        font-weight: 800;
+        font-size: clamp(28px, 2.5vw, 40px);
+        font-weight: 700;
         line-height: 1;
-        color: #f5fbf7;
+        color: #f8fff9;
       }
 
       .metric-sub {
         margin-top: 8px;
-        font-size: 13px;
-        color: #6f837b;
-        line-height: 1.5;
+        font-size: 12px;
+        line-height: 1.45;
+        color: #7c948b;
       }
 
       .dashboard-grid {
+        height: 100%;
+        min-height: 0;
         display: grid;
-        grid-template-columns: repeat(12, minmax(0, 1fr));
-        gap: 18px;
-        margin-top: 18px;
+        gap: 12px;
+        grid-template-columns: repeat(16, minmax(0, 1fr));
       }
 
-      .span-12 { grid-column: span 12; }
-      .span-8 { grid-column: span 8; }
-      .span-6 { grid-column: span 6; }
-      .span-4 { grid-column: span 4; }
+      .span-16 {
+        grid-column: span 16;
+      }
+
+      .span-8 {
+        grid-column: span 8;
+      }
+
+      .span-6 {
+        grid-column: span 6;
+      }
+
+      .span-4 {
+        grid-column: span 4;
+      }
 
       .panel {
-        padding: 22px;
+        height: 100%;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 14px 16px 16px;
       }
 
       .panel-head {
         display: flex;
         justify-content: space-between;
-        gap: 16px;
+        gap: 12px;
         align-items: flex-start;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
       }
 
-      .section-kicker {
-        color: #90a29b;
+      .panel-head > div:first-child {
+        min-width: 0;
+      }
+
+      .panel-kicker {
+        color: #7a9389;
       }
 
       .panel-title {
-        font-family: "Space Grotesk", sans-serif;
         margin-top: 6px;
-        font-size: 30px;
-        font-weight: 800;
-        line-height: 1.05;
-        color: #f2faf4;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(20px, 2vw, 28px);
+        line-height: 1;
+        letter-spacing: -0.04em;
+        color: #f7fff9;
       }
 
       .panel-copy {
-        margin-top: 8px;
-        font-size: 14px;
-        color: #7a8f86;
-        line-height: 1.55;
+        margin-top: 6px;
+        font-size: 12px;
+        line-height: 1.45;
+        color: #7c948b;
       }
 
       .panel-meta {
-        font-size: 12px;
-        color: #88a09a;
+        color: #84a197;
+        white-space: nowrap;
       }
 
       .chart-wrap {
+        height: 100%;
         position: relative;
-        height: 320px;
+        flex: 1;
+        min-height: 0;
       }
 
-      .chart-wrap.short {
-        height: 280px;
+      .scroll-pane {
+        height: 100%;
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        padding-right: 4px;
+        scrollbar-width: none;
       }
 
-      .panel-grid {
+      .scroll-pane::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+
+      #family-pressure {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 10px;
       }
 
       .family-card,
-      .milestone-card,
+      .hotspot-row,
       .list-item,
-      .hotspot-row {
-        border-radius: 18px;
+      .milestone-row {
+        border-radius: 16px;
         border: 1px solid var(--line);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0.016));
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
       }
 
-      .family-card,
-      .milestone-card {
-        padding: 14px;
+      .family-card {
+        padding: 12px;
       }
 
       .family-head,
-      .milestone-head,
+      .hotspot-head,
       .list-top,
-      .hotspot-head {
+      .milestone-head {
         display: flex;
         justify-content: space-between;
         gap: 10px;
-        align-items: center;
+        align-items: flex-start;
       }
 
       .family-title,
-      .milestone-title,
+      .hotspot-title,
       .list-title,
-      .hotspot-title {
-        font-size: 15px;
-        font-weight: 800;
-        color: #f1f9f3;
+      .milestone-title {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: #f5fff8;
       }
 
       .family-metric,
-      .milestone-metric,
-      .hotspot-value {
-        font-size: 24px;
-        font-weight: 800;
+      .hotspot-value,
+      .milestone-metric {
         font-family: "Space Grotesk", sans-serif;
-        color: #ebfff2;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1;
+        color: #f4fff8;
       }
 
       .family-sub,
-      .milestone-sub,
-      .hotspot-sub {
-        margin-top: 8px;
-        font-size: 13px;
-        color: #73867f;
+      .hotspot-sub,
+      .list-sub,
+      .milestone-sub {
+        margin-top: 6px;
+        font-size: 12px;
         line-height: 1.45;
+        color: #80978f;
       }
 
       .bar {
         margin-top: 10px;
-        height: 8px;
+        height: 6px;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.06);
         overflow: hidden;
@@ -423,8 +565,8 @@
         display: block;
         height: 100%;
         border-radius: 999px;
-        background: linear-gradient(90deg, var(--brand-soft), var(--brand));
-        box-shadow: 0 0 18px rgba(116, 216, 255, 0.22);
+        background: linear-gradient(90deg, var(--brand-cool), var(--brand));
+        box-shadow: 0 0 18px rgba(99, 217, 255, 0.2);
       }
 
       .hotspot-list,
@@ -432,151 +574,204 @@
       .milestone-list {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
       }
 
       .hotspot-row,
-      .list-item {
-        padding: 14px;
+      .list-item,
+      .milestone-row {
+        padding: 12px;
       }
 
-      .hotspot-meta {
+      .hotspot-meta,
+      .list-meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
+        gap: 6px;
+        margin-top: 8px;
       }
 
       .badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        padding: 5px 8px;
         border-radius: 999px;
-        border: 1px solid rgba(172, 193, 184, 0.12);
+        border: 1px solid rgba(176, 208, 195, 0.12);
         background: rgba(255, 255, 255, 0.04);
-        color: #d1dfd7;
-        padding: 6px 10px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-      }
-
-      .risk-list {
-        min-height: 100%;
+        color: #d2e2da;
       }
 
       .list-item {
-        display: block;
+        display: grid;
+        gap: 4px;
+        transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
       }
 
-      .list-title {
-        line-height: 1.45;
+      .list-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(214, 255, 114, 0.2);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
       }
 
-      .list-sub {
-        margin-top: 8px;
-        font-size: 13px;
-        color: #7c8f88;
-        line-height: 1.5;
-      }
-
-      .list-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
+      .list-code {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #c9ffd5;
+        white-space: nowrap;
       }
 
       .empty {
-        border-radius: 18px;
-        border: 1px dashed rgba(172, 193, 184, 0.18);
+        height: 100%;
+        border-radius: 16px;
+        border: 1px dashed rgba(176, 208, 195, 0.18);
         background: rgba(255, 255, 255, 0.03);
         padding: 18px;
-        color: #7e928a;
-        font-size: 14px;
-        line-height: 1.6;
+        color: #7f988f;
+        font-size: 13px;
+        line-height: 1.55;
       }
 
-      @media (max-width: 1320px) {
+      @media (min-width: 1180px) {
+        body {
+          overflow: hidden;
+        }
+
+        .shell {
+          min-height: 100vh;
+          height: 100vh;
+          grid-template-rows: auto auto auto minmax(0, 1fr);
+        }
+
+        .dashboard-grid {
+          height: calc(100vh - 460px);
+          grid-template-rows: 0.94fr 0.9fr 0.86fr 1.3fr;
+        }
+      }
+
+      @media (max-width: 1560px) {
+        .command-header {
+          grid-template-columns: 1fr;
+        }
+
+        .status-bank {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
         .metrics {
           grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
         .filter-grid {
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
-        .span-8,
+        .dashboard-grid {
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+        }
+
+        .span-16,
+        .span-8 {
+          grid-column: span 12;
+        }
+
         .span-6,
         .span-4 {
-          grid-column: span 12;
+          grid-column: span 6;
         }
       }
 
-      @media (max-width: 780px) {
+      @media (max-width: 960px) {
         .shell {
-          padding: 16px 12px 30px;
+          padding: 12px;
         }
 
-        .hero,
-        .filters,
-        .panel,
-        .metric-card {
-          border-radius: 22px;
-        }
-
-        h1 {
-          max-width: none;
-          font-size: clamp(42px, 14vw, 72px);
-        }
-
+        .status-bank,
+        .filter-grid,
         .metrics,
-        .panel-grid,
-        .filter-grid {
+        .dashboard-grid,
+        #family-pressure {
           grid-template-columns: 1fr;
         }
 
-        .chart-wrap,
-        .chart-wrap.short {
-          height: 260px;
+        .dashboard-grid > * {
+          grid-column: auto;
+        }
+
+        .command-header,
+        .filters,
+        .metric-card,
+        .panel {
+          border-radius: 20px;
+        }
+
+        h1 {
+          font-size: clamp(32px, 12vw, 48px);
+        }
+
+        .action-button {
+          width: 100%;
         }
       }
     </style>
   </head>
   <body>
     <div class="shell">
-      <section class="hero">
-        <div class="eyebrow">Shareable Observability Dashboard</div>
-        <h1>Issue Observability</h1>
-        <div class="hero-copy">
-          A shareable live GitHub issue dashboard optimized for backlog pressure, delivery health,
-          priority risk, and issue activity so leadership can quickly see what is moving and where
-          the team is carrying too much load.
+      <section class="command-header">
+        <div class="brand-block">
+          <div class="eyebrow">GitHub Mission Control</div>
+          <div class="headline">
+            <h1>Issue Command Deck</h1>
+            <p class="command-copy">
+              One-screen tactical view of backlog pressure, delivery velocity, milestone drift, and
+              issue hotspots for a 55-inch wall display.
+            </p>
+          </div>
         </div>
-        <div class="meta-row">
-          <div class="meta-chip" id="repo-meta">Loading repo…</div>
-          <div class="meta-chip" id="generated-meta">Loading live issue feed…</div>
-          <div class="meta-chip" id="scope-meta">Observing all issues</div>
-          <button class="action-button" id="refresh-button" type="button">Refresh Live Data</button>
+
+        <div class="status-bank">
+          <div class="status-card primary">
+            <div class="status-label">Repository Feed</div>
+            <div class="status-value" id="repo-meta">Loading repo…</div>
+            <div class="status-sub" id="generated-meta">Loading live issue telemetry…</div>
+          </div>
+
+          <div class="status-card">
+            <div class="status-label">Command Slice</div>
+            <div class="status-value" id="scope-meta">Observing all issues</div>
+            <div class="status-sub" id="signal-meta">Waiting for telemetry…</div>
+          </div>
+
+          <div class="status-card">
+            <div class="status-label">Mission Time</div>
+            <div class="status-value mono" id="clock-meta">--:--:--</div>
+            <div class="status-sub" id="countdown-meta">Auto sync idle</div>
+          </div>
+
+          <button class="action-button" id="refresh-button" type="button">Sync Live Data</button>
         </div>
       </section>
 
       <section class="filters">
         <div class="filter-grid">
-          <div>
+          <div class="filter-block">
             <div class="filter-label">State</div>
             <div class="pill-row" id="state-pills"></div>
           </div>
-          <label>
+
+          <label class="filter-block">
             <div class="filter-label">Milestone</div>
             <select id="milestone-select"></select>
           </label>
-          <label>
+
+          <label class="filter-block">
             <div class="filter-label">Family Focus</div>
             <select id="family-select"></select>
           </label>
-          <label>
+
+          <label class="filter-block">
             <div class="filter-label">Priority Focus</div>
             <select id="priority-select"></select>
           </label>
@@ -589,13 +784,13 @@
         <article class="panel span-8">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Backlog</div>
+              <div class="panel-kicker">Backlog Pressure</div>
               <div class="panel-title">Milestone Load</div>
               <div class="panel-copy">Open versus closed issue volume by milestone in the current slice.</div>
             </div>
             <div class="panel-meta" id="milestone-meta"></div>
           </div>
-          <div class="chart-wrap" id="milestone-chart-wrap">
+          <div class="chart-wrap">
             <canvas id="milestone-chart"></canvas>
           </div>
         </article>
@@ -603,12 +798,12 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Priority</div>
+              <div class="panel-kicker">Priority Heat</div>
               <div class="panel-title">Priority Pressure</div>
               <div class="panel-copy">Where the open and closed work is concentrating by priority.</div>
             </div>
           </div>
-          <div class="chart-wrap short" id="priority-chart-wrap">
+          <div class="chart-wrap">
             <canvas id="priority-chart"></canvas>
           </div>
         </article>
@@ -616,52 +811,13 @@
         <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Type</div>
-              <div class="panel-title">Issue Mix</div>
-              <div class="panel-copy">How the current slice breaks across bug, enhancement, docs, and support labels.</div>
-            </div>
-          </div>
-          <div class="chart-wrap short" id="type-chart-wrap">
-            <canvas id="type-chart"></canvas>
-          </div>
-        </article>
-
-        <article class="panel span-8">
-          <div class="panel-head">
-            <div>
-              <div class="section-kicker">Activity</div>
-              <div class="panel-title">Issue Throughput</div>
-              <div class="panel-copy">Issues opened and closed across the last twelve weeks.</div>
-            </div>
-          </div>
-          <div class="chart-wrap short" id="activity-chart-wrap">
-            <canvas id="activity-chart"></canvas>
-          </div>
-        </article>
-
-        <article class="panel span-8">
-          <div class="panel-head">
-            <div>
-              <div class="section-kicker">Flow</div>
-              <div class="panel-title">Burn-up Trend</div>
-              <div class="panel-copy">Total scope, completed scope, and remaining backlog across the last twelve weeks.</div>
-            </div>
-          </div>
-          <div class="chart-wrap short" id="burnup-chart-wrap">
-            <canvas id="burnup-chart"></canvas>
-          </div>
-        </article>
-
-        <article class="panel span-4">
-          <div class="panel-head">
-            <div>
-              <div class="section-kicker">Backlog</div>
+              <div class="panel-kicker">Backlog Drift</div>
               <div class="panel-title">Aging Pressure</div>
-              <div class="panel-copy">Open issues grouped by age so stale backlog and older high-priority work stand out fast.</div>
+              <div class="panel-copy">Open issue age bands so stale work stands out immediately.</div>
             </div>
             <div class="panel-meta" id="aging-meta"></div>
           </div>
-          <div class="chart-wrap short" id="aging-chart-wrap">
+          <div class="chart-wrap">
             <canvas id="aging-chart"></canvas>
           </div>
         </article>
@@ -669,76 +825,115 @@
         <article class="panel span-6">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Areas</div>
-              <div class="panel-title">Top Areas Under Load</div>
-              <div class="panel-copy">The area labels carrying the most open work right now.</div>
+              <div class="panel-kicker">Delivery Tempo</div>
+              <div class="panel-title">Issue Throughput</div>
+              <div class="panel-copy">Issues opened and closed across the last twelve weeks.</div>
             </div>
           </div>
-          <div class="chart-wrap" id="areas-chart-wrap">
+          <div class="chart-wrap">
+            <canvas id="activity-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-6">
+          <div class="panel-head">
+            <div>
+              <div class="panel-kicker">Flow</div>
+              <div class="panel-title">Burn-up Trend</div>
+              <div class="panel-copy">Total scope, completed scope, and remaining backlog across the last twelve weeks.</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="burnup-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <div class="panel-head">
+            <div>
+              <div class="panel-kicker">Composition</div>
+              <div class="panel-title">Issue Mix</div>
+              <div class="panel-copy">How the current slice breaks across bugs, enhancements, docs, and support.</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="type-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <div class="panel-head">
+            <div>
+              <div class="panel-kicker">Area Load</div>
+              <div class="panel-title">Top Areas Under Load</div>
+              <div class="panel-copy">Area labels carrying the most open work right now.</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
             <canvas id="areas-chart"></canvas>
           </div>
         </article>
 
-        <article class="panel span-6">
+        <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Closure Speed</div>
+              <div class="panel-kicker">Resolution Speed</div>
               <div class="panel-title">Closed Within SLA</div>
               <div class="panel-copy">Closed tickets that resolved within 24 hours, 7 days, and 30 days.</div>
             </div>
           </div>
-          <div class="chart-wrap short" id="closure-speed-chart-wrap">
+          <div class="chart-wrap">
             <canvas id="closure-speed-chart"></canvas>
           </div>
         </article>
 
-        <article class="panel span-6">
+        <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Families</div>
+              <div class="panel-kicker">Tag Families</div>
               <div class="panel-title">Family Pressure</div>
-              <div class="panel-copy">At-a-glance pressure by tag family with the hottest label inside each family.</div>
+              <div class="panel-copy">Pressure by label family with the hottest tag inside each band.</div>
             </div>
           </div>
-          <div class="panel-grid" id="family-pressure"></div>
+          <div class="scroll-pane" id="family-pressure" data-auto-scroll="family-pressure"></div>
         </article>
 
-        <article class="panel span-6">
+        <article class="panel span-4">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Hotspots</div>
+              <div class="panel-kicker">Weighted Signal</div>
               <div class="panel-title">Risk Hotspots</div>
-              <div class="panel-copy">Weighted trouble spots across labels, emphasizing open bugs and high priority work.</div>
+              <div class="panel-copy">Labels with the most pressure from open bugs and high-priority work.</div>
             </div>
           </div>
-          <div class="hotspot-list" id="hotspots"></div>
+          <div class="scroll-pane hotspot-list" id="hotspots" data-auto-scroll="hotspots"></div>
         </article>
 
-        <article class="panel span-6">
+        <article class="panel span-8">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Watchlist</div>
+              <div class="panel-kicker">Watchlist</div>
               <div class="panel-title">At-Risk Issues</div>
-              <div class="panel-copy">Open issues that should be watched first based on priority, bug status, and recency.</div>
+              <div class="panel-copy">Open issues that should be watched first based on priority, bug status, and age.</div>
             </div>
           </div>
-          <div class="risk-list" id="risk-list"></div>
+          <div class="scroll-pane risk-list" id="risk-list" data-auto-scroll="risk-list"></div>
         </article>
 
-        <article class="panel span-12">
+        <article class="panel span-8">
           <div class="panel-head">
             <div>
-              <div class="section-kicker">Delivery</div>
+              <div class="panel-kicker">Delivery Cadence</div>
               <div class="panel-title">Milestone Health</div>
               <div class="panel-copy">Completion status and backlog mix for every milestone in the current slice.</div>
             </div>
           </div>
-          <div class="milestone-list" id="milestone-health"></div>
+          <div class="scroll-pane milestone-list" id="milestone-health" data-auto-scroll="milestone-health"></div>
         </article>
       </section>
     </div>
 
     <script defer src="./vendor/chart.umd.min.js"></script>
-    <script type="module" src="./issue-graph-app.js?v=2"></script>
+    <script type="module" src="./issue-graph-app.js?v=3"></script>
   </body>
 </html>

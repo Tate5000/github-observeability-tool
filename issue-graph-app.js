@@ -58,6 +58,9 @@ const DAY_MS = HOUR_MS * 24;
 const LIVE_REFRESH_INTERVAL_MS = 1000 * 60 * 5;
 const LIVE_DATA_URL = '/api/issues-data';
 const SNAPSHOT_DATA_URL = './issue-graph-data.json';
+const TV_SCROLL_MEDIA_QUERY = '(min-width: 1180px)';
+const AUTO_SCROLL_PAUSE_MS = 1600;
+const AUTO_SCROLL_SPEED_PX = 0.32;
 const FLOW_LOOKBACK_WEEKS = 12;
 const CLOSURE_SPEED_BUCKETS = [
   { label: '24 hours', limitMs: DAY_MS, color: '#15b8a6' },
@@ -98,6 +101,9 @@ const elements = {
   repoMeta: document.getElementById('repo-meta'),
   generatedMeta: document.getElementById('generated-meta'),
   scopeMeta: document.getElementById('scope-meta'),
+  signalMeta: document.getElementById('signal-meta'),
+  clockMeta: document.getElementById('clock-meta'),
+  countdownMeta: document.getElementById('countdown-meta'),
   refreshButton: document.getElementById('refresh-button'),
   statePills: document.getElementById('state-pills'),
   milestoneSelect: document.getElementById('milestone-select'),
@@ -114,6 +120,10 @@ const elements = {
 
 let snapshot = null;
 let autoRefreshHandle = null;
+let clockHandle = null;
+let nextRefreshAt = Date.now() + LIVE_REFRESH_INTERVAL_MS;
+let resizeRefreshHandle = null;
+const autoScrollers = new Map();
 
 Chart.defaults.color = COLORS.muted;
 Chart.defaults.borderColor = COLORS.grid;
@@ -145,6 +155,22 @@ function areaLabels(issue) {
 
 function formatPct(value) {
   return Math.round(value * 100) + '%';
+}
+
+function formatClock(date = new Date()) {
+  return new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
+function formatCountdown(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function formatDate(dateString) {
@@ -208,6 +234,91 @@ function esc(text) {
     .replace(/"/g, '&quot;');
 }
 
+function setNextRefreshDeadline() {
+  nextRefreshAt = Date.now() + LIVE_REFRESH_INTERVAL_MS;
+  updateClockMeta();
+}
+
+function updateClockMeta() {
+  if (elements.clockMeta) {
+    elements.clockMeta.textContent = formatClock();
+  }
+
+  if (elements.countdownMeta) {
+    elements.countdownMeta.textContent = snapshot
+      ? `Next auto sync in ${formatCountdown(nextRefreshAt - Date.now())}`
+      : 'Awaiting first sync';
+  }
+}
+
+function startClock() {
+  if (clockHandle) window.clearInterval(clockHandle);
+  updateClockMeta();
+  clockHandle = window.setInterval(updateClockMeta, 1000);
+}
+
+function stopAllAutoScrollers() {
+  for (const controller of autoScrollers.values()) {
+    window.cancelAnimationFrame(controller.rafId);
+  }
+  autoScrollers.clear();
+}
+
+function startAutoScroller(element) {
+  const key = element.id || element.dataset.autoScroll;
+  const maxScroll = element.scrollHeight - element.clientHeight;
+
+  if (!key || !window.matchMedia(TV_SCROLL_MEDIA_QUERY).matches || maxScroll <= 12) {
+    element.scrollTop = 0;
+    return;
+  }
+
+  const controller = {
+    direction: 1,
+    pauseUntil: performance.now() + AUTO_SCROLL_PAUSE_MS,
+    rafId: 0,
+  };
+
+  const step = (timestamp) => {
+    const currentMaxScroll = element.scrollHeight - element.clientHeight;
+    if (currentMaxScroll <= 12) {
+      element.scrollTop = 0;
+      autoScrollers.delete(key);
+      return;
+    }
+
+    if (timestamp < controller.pauseUntil) {
+      controller.rafId = window.requestAnimationFrame(step);
+      return;
+    }
+
+    const nextPosition = element.scrollTop + controller.direction * AUTO_SCROLL_SPEED_PX;
+    if (nextPosition >= currentMaxScroll) {
+      element.scrollTop = currentMaxScroll;
+      controller.direction = -1;
+      controller.pauseUntil = timestamp + AUTO_SCROLL_PAUSE_MS;
+    } else if (nextPosition <= 0) {
+      element.scrollTop = 0;
+      controller.direction = 1;
+      controller.pauseUntil = timestamp + AUTO_SCROLL_PAUSE_MS;
+    } else {
+      element.scrollTop = nextPosition;
+    }
+
+    controller.rafId = window.requestAnimationFrame(step);
+  };
+
+  controller.rafId = window.requestAnimationFrame(step);
+  autoScrollers.set(key, controller);
+}
+
+function refreshAutoScrollers() {
+  stopAllAutoScrollers();
+  document.querySelectorAll('[data-auto-scroll]').forEach((element) => {
+    startAutoScroller(element);
+  });
+}
+
 function renderStatePills() {
   elements.statePills.innerHTML = STATE_OPTIONS.map(
     (option) => `<button class="pill ${state.stateFilter === option.value ? 'active' : ''}" data-state="${esc(option.value)}" type="button">${esc(option.label)}</button>`,
@@ -264,12 +375,10 @@ function syncSnapshotMeta(source) {
     ? new Date(snapshot.generatedAt).toLocaleString()
     : 'unknown time';
 
-  elements.repoMeta.textContent = source === 'live'
-    ? `${repoLabel} · Live GitHub`
-    : `${repoLabel} · Snapshot fallback`;
+  elements.repoMeta.textContent = repoLabel;
   elements.generatedMeta.textContent = source === 'live'
-    ? `Live as of ${generatedLabel}`
-    : `Snapshot as of ${generatedLabel}`;
+    ? `Live GitHub sync · ${generatedLabel}`
+    : `Snapshot fallback · ${generatedLabel}`;
 }
 
 function buildView() {
@@ -534,44 +643,94 @@ function buildView() {
   };
 }
 
+function buildCommandSignal(view) {
+  const topMilestone = view.milestoneSeries.find((row) => row.open > 0);
+  const recentActivity = view.activitySeries.slice(-4);
+  const openedRecent = recentActivity.reduce((sum, row) => sum + row.opened, 0);
+  const closedRecent = recentActivity.reduce((sum, row) => sum + row.closed, 0);
+  const flowDelta = closedRecent - openedRecent;
+  const staleShare = view.openIssues.length ? view.metrics.staleOpenCount / view.openIssues.length : 0;
+  const hottestLabel = view.hotspotRows[0];
+  const notes = [];
+
+  if (topMilestone) {
+    notes.push(`${topMilestone.milestone} carries ${topMilestone.open} open`);
+  }
+
+  if (flowDelta > 0) {
+    notes.push(`burning down ${flowDelta} issues over 4w`);
+  } else if (flowDelta < 0) {
+    notes.push(`scope grew by ${Math.abs(flowDelta)} issues over 4w`);
+  } else {
+    notes.push('flat flow over the last 4 weeks');
+  }
+
+  if (view.metrics.highPriorityOpen > 0) {
+    notes.push(`${view.metrics.highPriorityOpen} P0/P1 still open`);
+  } else {
+    notes.push('no P0/P1 currently open');
+  }
+
+  if (staleShare >= 0.35) {
+    notes.push(`${formatPct(staleShare)} of open work is stale`);
+  } else if (hottestLabel) {
+    notes.push(`hottest label ${hottestLabel.label}`);
+  }
+
+  return notes.slice(0, 3).join(' · ');
+}
+
 function renderMetrics(view) {
   const metrics = [
     {
       label: 'Issues In Scope',
       value: view.metrics.total,
       sub: `${view.metrics.open} open / ${view.metrics.closed} closed`,
+      tone: 'watch',
     },
     {
       label: 'Closure Rate',
       value: formatPct(view.metrics.closureRate),
       sub: 'closed share in the current slice',
+      tone: view.metrics.closureRate >= 0.6 ? 'good' : view.metrics.closureRate >= 0.4 ? 'watch' : 'alert',
     },
     {
       label: 'Median Time To Close',
       value: formatDuration(view.metrics.medianCloseMs),
       sub: view.metrics.p90CloseMs ? `p90 ${formatDuration(view.metrics.p90CloseMs)}` : 'not enough closed issues yet',
+      tone:
+        view.metrics.medianCloseMs == null
+          ? 'watch'
+          : view.metrics.medianCloseMs <= DAY_MS * 7
+            ? 'good'
+            : view.metrics.medianCloseMs <= DAY_MS * 21
+              ? 'watch'
+              : 'alert',
     },
     {
       label: 'High Priority Open',
       value: view.metrics.highPriorityOpen,
       sub: 'open P0 or P1 issues',
+      tone: view.metrics.highPriorityOpen === 0 ? 'good' : view.metrics.highPriorityOpen <= 3 ? 'watch' : 'alert',
     },
     {
       label: 'Stale Open >30d',
       value: view.metrics.staleOpenCount,
       sub: 'open issues older than 30 days',
+      tone: view.metrics.staleOpenCount === 0 ? 'good' : view.metrics.staleOpenCount <= 5 ? 'watch' : 'alert',
     },
     {
       label: 'Milestone Coverage',
       value: formatPct(view.metrics.milestoneCoverage),
       sub: 'issues assigned to a milestone',
+      tone: view.metrics.milestoneCoverage >= 0.8 ? 'good' : view.metrics.milestoneCoverage >= 0.55 ? 'watch' : 'alert',
     },
   ];
 
   elements.metrics.innerHTML = metrics
     .map(
       (metric) => `
-        <div class="metric-card">
+        <div class="metric-card" data-tone="${esc(metric.tone)}">
           <div class="metric-label">${esc(metric.label)}</div>
           <div class="metric-value">${esc(metric.value)}</div>
           <div class="metric-sub">${esc(metric.sub)}</div>
@@ -618,7 +777,7 @@ function renderHotspots(view) {
             <div class="hotspot-title">${esc(row.label)}</div>
             <div class="hotspot-value">${row.score}</div>
           </div>
-          <div class="hotspot-sub">${esc(FAMILY_LABELS[row.family] || row.family)} pressure score</div>
+          <div class="hotspot-sub">${esc(FAMILY_LABELS[row.family] || row.family)} · ${row.total} tagged issues</div>
           <div class="hotspot-meta">
             <span class="badge">${row.open} open</span>
             <span class="badge">${row.closed} closed</span>
@@ -637,21 +796,24 @@ function renderRiskList(view) {
     return;
   }
 
+  const nowMs = Date.now();
   elements.riskList.innerHTML = view.riskIssues
     .map((issue) => {
       const priority = priorityOf(issue);
       const type = typeOf(issue);
       const area = areaLabels(issue)[0] || 'No area';
+      const age = formatDuration(issueAgeMs(issue, nowMs));
       return `
         <a class="list-item" href="${esc(issue.url)}" target="_blank" rel="noreferrer">
           <div class="list-top">
             <div class="list-title">#${issue.number} · ${esc(issue.title)}</div>
+            <div class="list-code">${esc(PRIORITY_LABELS[priority])}</div>
           </div>
-          <div class="list-sub">Updated ${esc(formatDate(issue.updatedAt))} · ${esc(issue.milestone || 'No milestone')}</div>
+          <div class="list-sub">${esc(issue.milestone || 'No milestone')} · ${esc(area.replace('area:', ''))} · age ${esc(age)} · updated ${esc(formatDate(issue.updatedAt))}</div>
           <div class="list-meta">
-            <span class="badge">${esc(PRIORITY_LABELS[priority])}</span>
             <span class="badge">${esc(TYPE_LABELS[type])}</span>
-            <span class="badge">${esc(area.replace('area:', ''))}</span>
+            <span class="badge">${issue.state}</span>
+            <span class="badge">${esc(priority.startsWith('priority:') ? priority.replace('priority:', '') : priority)}</span>
           </div>
         </a>
       `;
@@ -670,12 +832,14 @@ function renderMilestoneHealth(view) {
   elements.milestoneHealth.innerHTML = view.milestoneHealth
     .map(
       (row) => `
-        <div class="milestone-card">
+        <div class="milestone-row">
           <div class="milestone-head">
-            <div class="milestone-title">${esc(row.milestone)}</div>
+            <div>
+              <div class="milestone-title">${esc(row.milestone)}</div>
+              <div class="milestone-sub">${row.total} issues · ${row.open} open / ${row.closed} closed</div>
+            </div>
             <div class="milestone-metric">${formatPct(row.completion)}</div>
           </div>
-          <div class="milestone-sub">${row.total} issues · ${row.open} open / ${row.closed} closed</div>
           <div class="bar"><span style="width:${Math.max(8, row.completion * 100)}%"></span></div>
         </div>
       `,
@@ -689,10 +853,19 @@ function baseChartOptions() {
     maintainAspectRatio: false,
     plugins: {
       legend: {
+        position: 'top',
+        align: 'end',
         labels: {
-          boxWidth: 10,
-          boxHeight: 10,
+          boxWidth: 9,
+          boxHeight: 9,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 12,
           color: COLORS.muted,
+          font: {
+            family: '"IBM Plex Mono", monospace',
+            size: 10,
+          },
         },
       },
       tooltip: {
@@ -700,16 +873,34 @@ function baseChartOptions() {
         padding: 12,
         titleColor: '#f8fafc',
         bodyColor: '#dbeafe',
+        titleFont: {
+          family: '"Space Grotesk", sans-serif',
+        },
       },
     },
     scales: {
       x: {
         grid: { color: COLORS.grid },
-        ticks: { color: COLORS.muted },
+        border: { display: false },
+        ticks: {
+          color: COLORS.muted,
+          maxRotation: 0,
+          font: {
+            family: '"IBM Plex Mono", monospace',
+            size: 10,
+          },
+        },
       },
       y: {
         grid: { color: COLORS.grid },
-        ticks: { color: COLORS.muted },
+        border: { display: false },
+        ticks: {
+          color: COLORS.muted,
+          font: {
+            family: '"IBM Plex Mono", monospace',
+            size: 10,
+          },
+        },
       },
     },
   };
@@ -1022,6 +1213,9 @@ function render() {
   renderStatePills();
   updateScopeMeta();
   const view = buildView();
+  if (elements.signalMeta) {
+    elements.signalMeta.textContent = buildCommandSignal(view) || 'No issue telemetry in the current slice';
+  }
   renderMetrics(view);
   renderFamilyPressure(view);
   renderHotspots(view);
@@ -1035,6 +1229,7 @@ function render() {
   renderAgingChart(view);
   renderAreasChart(view);
   renderClosureSpeedChart(view);
+  window.requestAnimationFrame(refreshAutoScrollers);
 }
 
 async function loadSnapshot() {
@@ -1060,6 +1255,8 @@ async function loadSnapshot() {
     throw lastError || new Error('Unable to load dashboard data.');
   }
 
+  setNextRefreshDeadline();
+
   renderSelectOptions(
     elements.milestoneSelect,
     [{ value: 'all', label: 'All milestones' }].concat(
@@ -1081,6 +1278,7 @@ function startAutoRefresh() {
       render();
     } catch (error) {
       console.warn('Auto-refresh failed', error);
+      setNextRefreshDeadline();
     }
   }, LIVE_REFRESH_INTERVAL_MS);
 }
@@ -1106,18 +1304,28 @@ function bindControls() {
 
   elements.refreshButton.addEventListener('click', async () => {
     elements.refreshButton.disabled = true;
-    elements.refreshButton.textContent = 'Refreshing…';
+    elements.refreshButton.textContent = 'Syncing…';
+    if (elements.countdownMeta) {
+      elements.countdownMeta.textContent = 'Manual sync in progress';
+    }
     try {
       await loadSnapshot();
       render();
     } finally {
       elements.refreshButton.disabled = false;
-      elements.refreshButton.textContent = 'Refresh Live Data';
+      elements.refreshButton.textContent = 'Sync Live Data';
+      updateClockMeta();
     }
+  });
+
+  window.addEventListener('resize', () => {
+    if (resizeRefreshHandle) window.clearTimeout(resizeRefreshHandle);
+    resizeRefreshHandle = window.setTimeout(refreshAutoScrollers, 120);
   });
 }
 
 async function init() {
+  startClock();
   bindControls();
   await loadSnapshot();
   render();
